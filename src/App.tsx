@@ -794,6 +794,18 @@ export default function App() {
                             @nulledserials
                           </a>
                         </p>
+
+                        <p className="text-sm">
+                          github
+                          <a
+                            href="https://github.com/xtpm"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-1 hover:underline transition-colors hover:text-zinc-300"
+                          >
+                            @xtpm
+                          </a>
+                        </p>
                       </div>
                     </div>
 
