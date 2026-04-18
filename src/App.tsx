@@ -229,6 +229,27 @@ export default function App() {
     }
   }, [isPlaying]);
 
+  useEffect(() => {
+    if (booting) return;
+    setIsPlaying(true);
+  }, [booting]);
+
+  useEffect(() => {
+    if (isPlaying) return;
+
+    const resumePlayback = () => {
+      setIsPlaying(true);
+    };
+
+    window.addEventListener("pointerdown", resumePlayback, { once: true });
+    window.addEventListener("keydown", resumePlayback, { once: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", resumePlayback);
+      window.removeEventListener("keydown", resumePlayback);
+    };
+  }, [isPlaying]);
+
   const statusColor =
     {
       online: "text-green-500",
@@ -376,14 +397,6 @@ export default function App() {
     setIsPlaying(true);
   };
 
-  const handleBackgroundSeek = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    const value = Number(event.target.value);
-    audio.currentTime = value;
-    setPlayerProgress(value);
-  };
-
   const titleClass = (title: string) => {
     if (title === "kobeni.net") {
       return "text-red-400 inline-block [text-shadow:0_0_16px_rgba(248,113,113,0.95),0_0_30px_rgba(248,113,113,0.45)]";
@@ -514,7 +527,7 @@ export default function App() {
           animate={{ opacity: booting ? 0 : 1, y: booting ? 12 : 0, scale: booting ? 0.99 : 1 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <audio ref={audioRef} preload="metadata">
+          <audio ref={audioRef} preload="metadata" autoPlay>
             <source src={currentBackgroundTrack.src} type="audio/mpeg" />
           </audio>
 
@@ -990,16 +1003,6 @@ export default function App() {
                   />
                 </div>
               </div>
-
-              <input
-                type="range"
-                min="0"
-                max={playerDuration || 0}
-                step="0.1"
-                value={Math.min(playerProgress, playerDuration || 0)}
-                onChange={handleBackgroundSeek}
-                className="mt-3 w-full accent-white"
-              />
             </motion.div>
           </div>
         </motion.div>

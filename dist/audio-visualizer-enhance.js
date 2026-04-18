@@ -111,6 +111,7 @@ function enhancePlayer() {
   }
 
   metaText.remove();
+  audio.autoplay = true;
 
   const visualizer = document.createElement("div");
   visualizer.style.marginTop = "12px";
@@ -147,6 +148,30 @@ function enhancePlayer() {
   player.querySelectorAll("button").forEach((button) => {
     button.addEventListener("click", bootVisualizer);
   });
+
+  const ranges = player.querySelectorAll('input[type="range"]');
+  const seekSlider = ranges[ranges.length - 1];
+  if (seekSlider) {
+    seekSlider.remove();
+  }
+
+  const startPlayback = async () => {
+    try {
+      await audio.play();
+      bootVisualizer();
+    } catch {
+      return;
+    }
+  };
+
+  startPlayback();
+
+  const resumePlayback = () => {
+    startPlayback();
+  };
+
+  window.addEventListener("pointerdown", resumePlayback, { once: true });
+  window.addEventListener("keydown", resumePlayback, { once: true });
 }
 
 enhancePlayer();
