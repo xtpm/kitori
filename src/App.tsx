@@ -21,6 +21,7 @@ export default function App() {
   const [playerProgress, setPlayerProgress] = useState(0);
   const [playerDuration, setPlayerDuration] = useState(0);
   const [playerVolume, setPlayerVolume] = useState(0.35);
+  const [autoplayMuted, setAutoplayMuted] = useState(true);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(
     Array.from({ length: 20 }, () => 0.14),
   );
@@ -31,6 +32,12 @@ export default function App() {
       artist: "Jane Remover",
       src: "/music/dancing-with-your-eyes-closed-jane-remover.mp3",
       cover: "/music/dancing-with-your-eyes-closed-jane-remover.png",
+    },
+    {
+      title: "Take a chance",
+      artist: "LynU",
+      src: "/music/take-a-chance-lynu.mp3",
+      cover: "/music/take-a-chance-lynu.jpg",
     },
   ];
 
@@ -167,6 +174,12 @@ export default function App() {
   }, [playerVolume]);
 
   useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.muted = autoplayMuted;
+  }, [autoplayMuted]);
+
+  useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
         window.cancelAnimationFrame(animationFrameRef.current);
@@ -233,6 +246,7 @@ export default function App() {
     if (isPlaying) return;
 
     const resumePlayback = () => {
+      setAutoplayMuted(false);
       setIsPlaying(true);
     };
 
@@ -383,6 +397,7 @@ export default function App() {
     if (!audio) return;
 
     try {
+      audio.muted = autoplayMuted;
       initializeVisualizer();
       await audio.play();
       setIsPlaying(true);
@@ -986,13 +1001,13 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="mt-3 flex h-8 items-end gap-1 overflow-hidden border border-zinc-800 bg-zinc-950/60 px-2 py-1">
+              <div className="mt-3 flex h-8 items-end justify-between gap-0.5 overflow-hidden border border-emerald-300/30 bg-zinc-950/60 px-2 py-1 shadow-[0_0_18px_rgba(110,231,183,0.12)]">
                 {visualizerBars.map((bar, index) => (
                   <motion.span
                     key={index}
                     animate={{ height: `${Math.max(18, bar * 100)}%`, opacity: isPlaying ? 1 : 0.45 }}
                     transition={{ duration: 0.18, ease: "easeOut" }}
-                    className="block flex-1 bg-white/90"
+                    className="block h-full min-w-0 flex-1 rounded-[1px] bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.8)]"
                   />
                 ))}
               </div>
@@ -1038,7 +1053,10 @@ export default function App() {
                     max="1"
                     step="0.01"
                     value={playerVolume}
-                    onChange={(event) => setPlayerVolume(Number(event.target.value))}
+                    onChange={(event) => {
+                      setAutoplayMuted(false);
+                      setPlayerVolume(Number(event.target.value));
+                    }}
                     className="w-full accent-white"
                   />
                 </div>

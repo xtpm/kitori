@@ -10,10 +10,13 @@ function createBars(container) {
 
   for (let index = 0; index < BAR_COUNT; index += 1) {
     const bar = document.createElement("span");
-    bar.style.flex = "1";
     bar.style.display = "block";
+    bar.style.flex = "1 1 0";
+    bar.style.minWidth = "0";
     bar.style.height = "14%";
-    bar.style.background = "rgba(255,255,255,0.9)";
+    bar.style.background = "rgb(110 231 183)";
+    bar.style.borderRadius = "1px";
+    bar.style.boxShadow = "0 0 10px rgba(110,231,183,0.8)";
     bar.style.opacity = "0.45";
     bar.style.transition = "height 140ms ease, opacity 140ms ease";
     container.appendChild(bar);
@@ -114,17 +117,20 @@ function enhancePlayer() {
   audio.autoplay = true;
   audio.preload = "auto";
   audio.playsInline = true;
+  audio.muted = true;
 
   const visualizer = document.createElement("div");
   visualizer.style.marginTop = "12px";
   visualizer.style.display = "flex";
   visualizer.style.alignItems = "end";
-  visualizer.style.gap = "4px";
+  visualizer.style.justifyContent = "space-between";
+  visualizer.style.gap = "2px";
   visualizer.style.height = "32px";
   visualizer.style.overflow = "hidden";
-  visualizer.style.border = "1px solid rgb(39 39 42)";
+  visualizer.style.border = "1px solid rgba(110,231,183,0.3)";
   visualizer.style.background = "rgba(9,9,11,0.6)";
   visualizer.style.padding = "4px 8px";
+  visualizer.style.boxShadow = "0 0 18px rgba(110,231,183,0.12)";
 
   const bars = createBars(visualizer);
 
@@ -178,11 +184,19 @@ function enhancePlayer() {
   });
 
   const resumePlayback = () => {
+    audio.muted = false;
     startPlayback();
   };
 
   window.addEventListener("pointerdown", resumePlayback, { once: true });
   window.addEventListener("keydown", resumePlayback, { once: true });
+
+  const volumeSlider = ranges[ranges.length - 2];
+  if (volumeSlider) {
+    volumeSlider.addEventListener("input", () => {
+      audio.muted = false;
+    });
+  }
 }
 
 enhancePlayer();
