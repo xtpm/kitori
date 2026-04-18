@@ -230,11 +230,6 @@ export default function App() {
   }, [isPlaying]);
 
   useEffect(() => {
-    if (booting) return;
-    setIsPlaying(true);
-  }, [booting]);
-
-  useEffect(() => {
     if (isPlaying) return;
 
     const resumePlayback = () => {
@@ -383,6 +378,19 @@ export default function App() {
     animateVisualizer();
   };
 
+  const attemptAutoplay = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    try {
+      initializeVisualizer();
+      await audio.play();
+      setIsPlaying(true);
+    } catch {
+      setIsPlaying(false);
+    }
+  };
+
   const toggleBackgroundPlayer = () => {
     setIsPlaying((prev) => !prev);
   };
@@ -409,6 +417,38 @@ export default function App() {
     }
     return "text-white";
   };
+
+  useEffect(() => {
+    if (booting) return;
+    attemptAutoplay();
+  }, [booting, currentTrackIndex]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const retryAutoplay = () => {
+      attemptAutoplay();
+    };
+
+    const retryWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        attemptAutoplay();
+      }
+    };
+
+    audio.addEventListener("loadeddata", retryAutoplay);
+    audio.addEventListener("canplay", retryAutoplay);
+    window.addEventListener("pageshow", retryAutoplay);
+    document.addEventListener("visibilitychange", retryWhenVisible);
+
+    return () => {
+      audio.removeEventListener("loadeddata", retryAutoplay);
+      audio.removeEventListener("canplay", retryAutoplay);
+      window.removeEventListener("pageshow", retryAutoplay);
+      document.removeEventListener("visibilitychange", retryWhenVisible);
+    };
+  }, [booting, currentTrackIndex]);
 
   return (
     <>
@@ -527,7 +567,7 @@ export default function App() {
           animate={{ opacity: booting ? 0 : 1, y: booting ? 12 : 0, scale: booting ? 0.99 : 1 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <audio ref={audioRef} preload="metadata" autoPlay>
+          <audio ref={audioRef} preload="auto" autoPlay playsInline>
             <source src={currentBackgroundTrack.src} type="audio/mpeg" />
           </audio>
 

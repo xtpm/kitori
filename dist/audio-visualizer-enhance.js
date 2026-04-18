@@ -112,6 +112,8 @@ function enhancePlayer() {
 
   metaText.remove();
   audio.autoplay = true;
+  audio.preload = "auto";
+  audio.playsInline = true;
 
   const visualizer = document.createElement("div");
   visualizer.style.marginTop = "12px";
@@ -165,6 +167,15 @@ function enhancePlayer() {
   };
 
   startPlayback();
+
+  audio.addEventListener("loadeddata", startPlayback);
+  audio.addEventListener("canplay", startPlayback);
+  window.addEventListener("pageshow", startPlayback);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      startPlayback();
+    }
+  });
 
   const resumePlayback = () => {
     startPlayback();
