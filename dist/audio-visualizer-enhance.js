@@ -23,6 +23,10 @@ function ensureRgbProjectStyle() {
       filter: drop-shadow(0 0 10px rgba(255, 120, 210, 0.28))
         drop-shadow(0 0 18px rgba(120, 210, 255, 0.2));
     }
+    .mint-active-glow {
+      color: rgb(110 231 183);
+      text-shadow: 0 0 10px rgba(110, 231, 183, 0.85), 0 0 18px rgba(110, 231, 183, 0.45);
+    }
   `;
 
   document.head.appendChild(style);
@@ -33,6 +37,15 @@ function syncKuudereProjectTitles() {
     const text = node.textContent?.trim();
     if (text === "kuudere.cc") {
       node.classList.add("kuudere-project-rgb");
+    }
+  });
+}
+
+function syncActiveStatusGlow() {
+  document.querySelectorAll("p").forEach((node) => {
+    const text = node.textContent?.trim()?.toLowerCase();
+    if (text === "status: active" && !node.querySelector(".mint-active-glow")) {
+      node.innerHTML = 'status: <span class="mint-active-glow">active</span>';
     }
   });
 }
@@ -129,6 +142,7 @@ async function connectVisualizer(audio, bars) {
 function enhancePlayer() {
   ensureRgbProjectStyle();
   syncKuudereProjectTitles();
+  syncActiveStatusGlow();
 
   const audio = document.querySelector("audio");
   const title = Array.from(document.querySelectorAll("p")).find(
@@ -239,6 +253,7 @@ enhancePlayer();
 
 const projectTitleObserver = new MutationObserver(() => {
   syncKuudereProjectTitles();
+  syncActiveStatusGlow();
 });
 
 projectTitleObserver.observe(document.body, {

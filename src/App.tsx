@@ -445,6 +445,21 @@ export default function App() {
     return "text-white";
   };
 
+  const renderProjectMeta = (title: string, meta: string) => {
+    if (title === "kuudere.cc" && meta === "status: active") {
+      return (
+        <>
+          status:{" "}
+          <span className="text-emerald-300 [text-shadow:0_0_10px_rgba(110,231,183,0.85),0_0_18px_rgba(110,231,183,0.45)]">
+            active
+          </span>
+        </>
+      );
+    }
+
+    return meta;
+  };
+
   useEffect(() => {
     if (booting) return;
     attemptAutoplay();
@@ -858,9 +873,9 @@ export default function App() {
                           </div>
 
                           <div>
-                            <p className="text-pink-400 mb-2 inline-block [text-shadow:0_0_10px_rgba(244,114,182,0.35)]">
-                              .gg/bunnie
-                            </p>
+                        <p className="text-red-400 mb-2 inline-block [text-shadow:0_0_10px_rgba(248,113,113,0.35)]">
+                          .gg/bunnie
+                        </p>
                             <div className="space-y-1">
                               {["serena", "shad", "jace"].map((name) => (
                                 <motion.div
@@ -985,7 +1000,7 @@ export default function App() {
                                 {hoveredProject.panelText}
                               </p>
                               <p className="text-zinc-500 text-[11px] mt-4 uppercase tracking-wide">
-                                {hoveredProject.panelMeta}
+                                {renderProjectMeta(hoveredProject.title, hoveredProject.panelMeta)}
                               </p>
                             </motion.div>
                           ) : (
