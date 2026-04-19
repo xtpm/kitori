@@ -21,7 +21,6 @@ export default function App() {
   const [playerProgress, setPlayerProgress] = useState(0);
   const [playerDuration, setPlayerDuration] = useState(0);
   const [playerVolume, setPlayerVolume] = useState(0.35);
-  const [autoplayMuted, setAutoplayMuted] = useState(true);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(
     Array.from({ length: 20 }, () => 0.14),
   );
@@ -183,12 +182,6 @@ export default function App() {
   }, [playerVolume]);
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-    audio.muted = autoplayMuted;
-  }, [autoplayMuted]);
-
-  useEffect(() => {
     return () => {
       if (animationFrameRef.current) {
         window.cancelAnimationFrame(animationFrameRef.current);
@@ -249,23 +242,6 @@ export default function App() {
     if (!isPlaying) {
       setVisualizerBars((prev) => prev.map(() => 0.14));
     }
-  }, [isPlaying]);
-
-  useEffect(() => {
-    if (isPlaying) return;
-
-    const resumePlayback = () => {
-      setAutoplayMuted(false);
-      setIsPlaying(true);
-    };
-
-    window.addEventListener("pointerdown", resumePlayback, { once: true });
-    window.addEventListener("keydown", resumePlayback, { once: true });
-
-    return () => {
-      window.removeEventListener("pointerdown", resumePlayback);
-      window.removeEventListener("keydown", resumePlayback);
-    };
   }, [isPlaying]);
 
   const statusColor =
@@ -401,20 +377,6 @@ export default function App() {
     animateVisualizer();
   };
 
-  const attemptAutoplay = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    try {
-      audio.muted = autoplayMuted;
-      initializeVisualizer();
-      await audio.play();
-      setIsPlaying(true);
-    } catch {
-      setIsPlaying(false);
-    }
-  };
-
   const toggleBackgroundPlayer = () => {
     setIsPlaying((prev) => !prev);
   };
@@ -463,33 +425,6 @@ export default function App() {
   useEffect(() => {
     if (booting) return;
     attemptAutoplay();
-  }, [booting, currentTrackIndex]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const retryAutoplay = () => {
-      attemptAutoplay();
-    };
-
-    const retryWhenVisible = () => {
-      if (document.visibilityState === "visible") {
-        attemptAutoplay();
-      }
-    };
-
-    audio.addEventListener("loadeddata", retryAutoplay);
-    audio.addEventListener("canplay", retryAutoplay);
-    window.addEventListener("pageshow", retryAutoplay);
-    document.addEventListener("visibilitychange", retryWhenVisible);
-
-    return () => {
-      audio.removeEventListener("loadeddata", retryAutoplay);
-      audio.removeEventListener("canplay", retryAutoplay);
-      window.removeEventListener("pageshow", retryAutoplay);
-      document.removeEventListener("visibilitychange", retryWhenVisible);
-    };
   }, [booting, currentTrackIndex]);
 
   return (
@@ -611,7 +546,7 @@ export default function App() {
           animate={{ opacity: booting ? 0 : 1, y: booting ? 12 : 0, scale: booting ? 0.99 : 1 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <audio ref={audioRef} preload="auto" autoPlay playsInline>
+          <audio ref={audioRef} preload="metadata" playsInline>
             <source src={currentBackgroundTrack.src} type="audio/mpeg" />
           </audio>
 
@@ -1092,7 +1027,6 @@ export default function App() {
                     step="0.01"
                     value={playerVolume}
                     onChange={(event) => {
-                      setAutoplayMuted(false);
                       setPlayerVolume(Number(event.target.value));
                     }}
                     className="w-full accent-white"

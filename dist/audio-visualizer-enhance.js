@@ -188,10 +188,9 @@ function enhancePlayer() {
   }
 
   metaText.remove();
-  audio.autoplay = true;
-  audio.preload = "auto";
+  audio.autoplay = false;
+  audio.preload = "metadata";
   audio.playsInline = true;
-  audio.muted = true;
 
   const visualizer = document.createElement("div");
   visualizer.style.marginTop = "12px";
@@ -237,40 +236,6 @@ function enhancePlayer() {
     seekSlider.remove();
   }
 
-  const startPlayback = async () => {
-    try {
-      await audio.play();
-      bootVisualizer();
-    } catch {
-      return;
-    }
-  };
-
-  startPlayback();
-
-  audio.addEventListener("loadeddata", startPlayback);
-  audio.addEventListener("canplay", startPlayback);
-  window.addEventListener("pageshow", startPlayback);
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") {
-      startPlayback();
-    }
-  });
-
-  const resumePlayback = () => {
-    audio.muted = false;
-    startPlayback();
-  };
-
-  window.addEventListener("pointerdown", resumePlayback, { once: true });
-  window.addEventListener("keydown", resumePlayback, { once: true });
-
-  const volumeSlider = ranges[ranges.length - 2];
-  if (volumeSlider) {
-    volumeSlider.addEventListener("input", () => {
-      audio.muted = false;
-    });
-  }
 }
 
 enhancePlayer();
