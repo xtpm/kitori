@@ -50,6 +50,29 @@ function syncActiveStatusGlow() {
   });
 }
 
+function disableProjectCardLinks() {
+  document.querySelectorAll('a').forEach((node) => {
+    const title = node.querySelector('p')?.textContent?.trim();
+    if (!title) {
+      return;
+    }
+
+    const projectTitles = new Set(["kuudere.cc", "kobeni.net", "yotsuba.cc", "Luck Software"]);
+    if (!projectTitles.has(title)) {
+      return;
+    }
+
+    node.removeAttribute("href");
+    node.removeAttribute("target");
+    node.removeAttribute("rel");
+    node.style.cursor = "default";
+    node.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+  });
+}
+
 function createBars(container) {
   const bars = [];
   container.innerHTML = "";
@@ -143,6 +166,7 @@ function enhancePlayer() {
   ensureRgbProjectStyle();
   syncKuudereProjectTitles();
   syncActiveStatusGlow();
+  disableProjectCardLinks();
 
   const audio = document.querySelector("audio");
   const title = Array.from(document.querySelectorAll("p")).find(
@@ -254,6 +278,7 @@ enhancePlayer();
 const projectTitleObserver = new MutationObserver(() => {
   syncKuudereProjectTitles();
   syncActiveStatusGlow();
+  disableProjectCardLinks();
 });
 
 projectTitleObserver.observe(document.body, {

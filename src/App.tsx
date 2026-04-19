@@ -945,11 +945,8 @@ export default function App() {
                       <h3 className="text-white mb-4">projects</h3>
                       <div className="space-y-3">
                         {projectItems.map((item) => (
-                          <a
+                          <div
                             key={item.title}
-                            href={item.link}
-                            target="_blank"
-                            rel="noreferrer"
                             onMouseEnter={() => setHoveredProject(item)}
                             onMouseLeave={() => setHoveredProject(null)}
                             className="block border border-zinc-800 p-3 transition-all duration-200 hover:bg-zinc-900/70 hover:-translate-y-0.5 hover:shadow-[0_0_18px_rgba(255,255,255,0.06)]"
@@ -975,7 +972,7 @@ export default function App() {
                                 item.desc
                               )}
                             </p>
-                          </a>
+                          </div>
                         ))}
                       </div>
                     </div>
