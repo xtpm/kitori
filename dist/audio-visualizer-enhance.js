@@ -4,6 +4,39 @@ let analyser;
 let sourceNode;
 let animationFrameId;
 
+function ensureRgbProjectStyle() {
+  if (document.getElementById("kuudere-project-rgb-style")) {
+    return;
+  }
+
+  const style = document.createElement("style");
+  style.id = "kuudere-project-rgb-style";
+  style.textContent = `
+    .kuudere-project-rgb {
+      display: inline-block;
+      background: linear-gradient(90deg, #ff4d4d, #ffd24d, #4dff88, #4dd2ff, #b84dff, #ff4db8, #ff4d4d);
+      background-size: 300% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: rgbshift 3s linear infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 120, 210, 0.28))
+        drop-shadow(0 0 18px rgba(120, 210, 255, 0.2));
+    }
+  `;
+
+  document.head.appendChild(style);
+}
+
+function syncKuudereProjectTitles() {
+  document.querySelectorAll("p").forEach((node) => {
+    const text = node.textContent?.trim();
+    if (text === "kuudere.cc") {
+      node.classList.add("kuudere-project-rgb");
+    }
+  });
+}
+
 function createBars(container) {
   const bars = [];
   container.innerHTML = "";
@@ -94,6 +127,9 @@ async function connectVisualizer(audio, bars) {
 }
 
 function enhancePlayer() {
+  ensureRgbProjectStyle();
+  syncKuudereProjectTitles();
+
   const audio = document.querySelector("audio");
   const title = Array.from(document.querySelectorAll("p")).find(
     (node) => node.textContent?.trim() === "Dancing with your eyes closed",
@@ -200,3 +236,12 @@ function enhancePlayer() {
 }
 
 enhancePlayer();
+
+const projectTitleObserver = new MutationObserver(() => {
+  syncKuudereProjectTitles();
+});
+
+projectTitleObserver.observe(document.body, {
+  childList: true,
+  subtree: true,
+});

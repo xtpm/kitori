@@ -45,6 +45,15 @@ export default function App() {
 
   const projectItems = [
     {
+      title: "kuudere.cc",
+      desc: "my digital paradise. a passion project for me and my friends, built as a home beyond bio links.",
+      link: "https://kuudere.cc",
+      panelTitle: "kuudere.cc",
+      panelText:
+        "kuudere.cc is my digital paradise, built as a personal space for me and my friends to exist online without the limits of typical bio link pages. it is a passion project centered around identity, creativity, and having a place that feels more alive, personal, and ours.",
+      panelMeta: "status: active",
+    },
+    {
       title: "kobeni.net",
       desc: "a exclusive invite only bio link service | ON HOLD",
       link: "#",
@@ -421,6 +430,9 @@ export default function App() {
   };
 
   const titleClass = (title: string) => {
+    if (title === "kuudere.cc") {
+      return "rgb-text inline-block";
+    }
     if (title === "kobeni.net") {
       return "text-red-400 inline-block [text-shadow:0_0_16px_rgba(248,113,113,0.95),0_0_30px_rgba(248,113,113,0.45)]";
     }
@@ -479,6 +491,8 @@ export default function App() {
           background-clip: text;
           color: transparent;
           animation: rgbshift 3s linear infinite;
+          filter: drop-shadow(0 0 10px rgba(255, 120, 210, 0.28))
+            drop-shadow(0 0 18px rgba(120, 210, 255, 0.2));
         }
         .hide-native-cursor,
         .hide-native-cursor * {
@@ -967,7 +981,7 @@ export default function App() {
                               <p className={`text-sm mb-2 ${titleClass(hoveredProject.title)}`}>
                                 {hoveredProject.panelTitle}
                               </p>
-                              <p className="text-zinc-400 text-xs leading-6">
+                              <p className="text-zinc-400 text-sm leading-7">
                                 {hoveredProject.panelText}
                               </p>
                               <p className="text-zinc-500 text-[11px] mt-4 uppercase tracking-wide">
