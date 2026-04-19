@@ -422,11 +422,6 @@ export default function App() {
     return meta;
   };
 
-  useEffect(() => {
-    if (booting) return;
-    attemptAutoplay();
-  }, [booting, currentTrackIndex]);
-
   return (
     <>
       <style>{`
