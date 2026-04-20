@@ -344,6 +344,23 @@ export default function App() {
     };
   }, [spotify, now]);
 
+  const { progress: nyandereSpotifyProgress, current: nyandereSpotifyCurrent, duration: nyandereSpotifyDuration } = useMemo(() => {
+    if (!nyandereSpotify?.timestamps?.start || !nyandereSpotify?.timestamps?.end) {
+      return { progress: 0, current: 0, duration: 0 };
+    }
+
+    const start = nyandereSpotify.timestamps.start;
+    const end = nyandereSpotify.timestamps.end;
+    const total = Math.max(end - start, 0);
+    const elapsed = Math.max(0, Math.min(now - start, total));
+
+    return {
+      progress: total > 0 ? (elapsed / total) * 100 : 0,
+      current: elapsed,
+      duration: total,
+    };
+  }, [nyandereSpotify, now]);
+
   const format = (ms: number) => {
     const totalSeconds = Math.max(0, Math.floor(ms / 1000));
     const minutes = Math.floor(totalSeconds / 60);
@@ -575,15 +592,23 @@ export default function App() {
           animation: bootflicker 1.4s linear infinite;
         }
         html, body {
-          background: #050506;
+          background: #f4f7f4;
           scroll-behavior: smooth;
         }
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@600&display=swap');
         .nyandere-sky {
-          background: #050506;
+          --ny-bg: #f4f7f4;
+          --ny-panel: #ffffff;
+          --ny-surface: #ffffff;
+          --ny-surface-soft: #ffffff;
+          --ny-tab: #3decff;
+          --ny-border: #3decff;
+          --ny-text: #111827;
+          --ny-muted: #425466;
+          background: var(--ny-bg);
           font-family: "Inter", sans-serif;
           font-weight: 600;
-          color: #ffffff;
+          color: var(--ny-text);
         }
         .nyandere-sky * {
           font-family: inherit;
@@ -594,25 +619,25 @@ export default function App() {
         .nyandere-sky h3,
         .nyandere-sky span,
         .nyandere-sky div {
-          color: #ffffff !important;
+          color: var(--ny-text) !important;
         }
         .nyandere-panel {
-          border: 1px solid rgba(74, 74, 82, 0.78);
-          background: #0b0b0f;
+          border: 1px solid rgba(61, 236, 255, 0.92);
+          background: var(--ny-panel);
           box-shadow:
-            inset 0 0 0 1px rgba(255,255,255,0.08),
-            0 0 0 1px rgba(74, 74, 82, 0.22),
-            0 14px 30px rgba(0, 0, 0, 0.35);
+            inset 0 0 0 1px rgba(255,255,255,0.9),
+            0 0 0 1px rgba(61,236,255,0.22),
+            0 14px 30px rgba(61,236,255,0.14);
         }
         .nyandere-box {
-          border: 1px solid rgba(74, 74, 82, 0.88);
-          background: #111117;
-          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+          border: 1px solid rgba(61, 236, 255, 0.88);
+          background: var(--ny-surface-soft);
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6);
         }
         .nyandere-tab {
-          border: 1px solid rgba(74, 74, 82, 0.88);
-          background: #0d0d12;
-          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.05);
+          border: 1px solid rgba(61, 236, 255, 0.88);
+          background: rgba(61, 236, 255, 0.18);
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
         }
         .nyandere-tab-link {
           display: block;
@@ -622,7 +647,7 @@ export default function App() {
         .nyandere-link-item {
           display: block;
           text-decoration: none;
-          color: #d8d2e7;
+          color: var(--ny-muted);
           transition:
             transform 0.18s ease,
             border-color 0.18s ease,
@@ -631,9 +656,9 @@ export default function App() {
         }
         .nyandere-link-item:hover {
           transform: translateX(4px);
-          border-color: rgba(160, 160, 172, 0.92);
-          background: #14141b;
-          color: #ffffff;
+          border-color: rgba(61, 236, 255, 1);
+          background: rgba(61, 236, 255, 0.2);
+          color: var(--ny-text);
         }
         .nyandere-social-card {
           display: block;
@@ -646,13 +671,100 @@ export default function App() {
         }
         .nyandere-social-card:hover {
           transform: translateY(-3px);
-          border-color: rgba(206, 184, 255, 0.95);
-          background: #14141b;
-          box-shadow: 0 0 16px rgba(206, 184, 255, 0.28);
+          border-color: rgba(61, 236, 255, 1);
+          background: rgba(61, 236, 255, 0.18);
+          box-shadow: 0 0 18px rgba(61, 236, 255, 0.24);
+        }
+        .nyandere-friend-card {
+          transition:
+            transform 0.35s ease,
+            border-color 0.35s ease,
+            background-color 0.35s ease,
+            box-shadow 0.35s ease;
+        }
+        .nyandere-friend-card:hover {
+          transform: translateY(-3px);
+          border-color: rgba(61, 236, 255, 1);
+          background: rgba(61, 236, 255, 0.18);
+          box-shadow: 0 0 18px rgba(61, 236, 255, 0.24);
         }
         .nyandere-note {
-          border: 2px dashed rgba(74, 74, 82, 0.9);
-          background: #09090d;
+          border: 2px dashed rgba(61, 236, 255, 0.6);
+          background: rgba(61, 236, 255, 0.08);
+        }
+        @keyframes nyandereOpeningWash {
+          0% {
+            opacity: 0.95;
+            transform: scaleY(1);
+          }
+          65% {
+            opacity: 0.42;
+          }
+          100% {
+            opacity: 0;
+            transform: scaleY(1.02);
+          }
+        }
+        @keyframes nyandereOpeningGrid {
+          0% {
+            opacity: 0;
+            transform: translateY(-24px);
+          }
+          18% {
+            opacity: 0.45;
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(36px);
+          }
+        }
+        @keyframes nyandereOpeningGlow {
+          0% {
+            opacity: 0;
+            transform: scale(0.98);
+          }
+          30% {
+            opacity: 0.35;
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1.04);
+          }
+        }
+        .nyandere-opening-layer {
+          pointer-events: none;
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+        }
+        .nyandere-opening-wash {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(180deg, rgba(61,236,255,0.28), rgba(61,236,255,0.08) 32%, rgba(255,255,255,0) 72%),
+            radial-gradient(circle at 18% 12%, rgba(61,236,255,0.28), transparent 38%);
+          transform-origin: top center;
+          animation: nyandereOpeningWash 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .nyandere-opening-grid {
+          position: absolute;
+          inset: -10% 0 0;
+          background-image:
+            linear-gradient(rgba(61,236,255,0.22) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(61,236,255,0.14) 1px, transparent 1px);
+          background-size: 100% 28px, 28px 100%;
+          mix-blend-mode: screen;
+          animation: nyandereOpeningGrid 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+        .nyandere-opening-glow {
+          position: absolute;
+          inset: 8% 10%;
+          border: 1px solid rgba(61,236,255,0.26);
+          box-shadow:
+            0 0 48px rgba(61,236,255,0.16),
+            inset 0 0 36px rgba(61,236,255,0.08);
+          animation: nyandereOpeningGlow 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
         @keyframes nyandereFadeRise {
           from {
@@ -670,51 +782,54 @@ export default function App() {
           will-change: opacity, transform;
         }
         .nyandere-delay-1 {
-          animation-delay: 0.08s;
-        }
-        .nyandere-delay-2 {
           animation-delay: 0.18s;
         }
-        .nyandere-delay-3 {
+        .nyandere-delay-2 {
           animation-delay: 0.28s;
         }
+        .nyandere-delay-3 {
+          animation-delay: 0.42s;
+        }
         .nyandere-delay-4 {
-          animation-delay: 0.38s;
+          animation-delay: 0.56s;
         }
         .nyandere-title {
-          font-weight: 600;
+          font-family: "Cormorant Garamond", serif;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          line-height: 0.95;
         }
       `}</style>
 
       {isNyanderePage ? (
-        <div className="min-h-screen nyandere-sky text-[#d7d2e5] px-4 py-8">
-          <div className="max-w-6xl mx-auto">
+        <div className="min-h-screen nyandere-sky relative overflow-hidden text-[#111827] px-4 py-8">
+          <div className="nyandere-opening-layer">
+            <div className="nyandere-opening-wash" />
+            <div className="nyandere-opening-grid" />
+            <div className="nyandere-opening-glow" />
+          </div>
+          <div className="relative z-10 max-w-6xl mx-auto">
             <div className="nyandere-panel nyandere-load-in p-4 md:p-6 backdrop-blur-[2px]">
               <div className="nyandere-box overflow-hidden">
                 <div
                   id="nyandere-index"
-                  className="relative min-h-[210px] border-b border-[#4a4a52]/70 bg-[#0b0b0f] px-6 pt-8 pb-5 md:px-10"
+                  className="relative min-h-[210px] border-b border-[#3decff]/60 bg-[#ffffff] px-6 pt-8 pb-5 md:px-10"
                 >
-                  <div className="relative z-10 flex h-full flex-col justify-between gap-8 md:flex-row md:items-end">
+                  <div className="relative z-10 flex h-full flex-col justify-end">
                     <div className="max-w-xl">
-                      <p className="mb-3 text-xs uppercase tracking-[0.35em] text-[#c8c1db]/80">
-                        personal page
+                      <p className="rgb-text mb-2 text-xs tracking-[0.35em]">
+                        /nyandere
                       </p>
-                      <h1 className="nyandere-title inline-block text-4xl italic tracking-wide text-[#f0edf7] drop-shadow-[0_0_10px_rgba(255,255,255,0.08)] md:text-6xl">
-                        NYANDERE.LOG
+                      <h1 className="nyandere-title mt-20 -translate-x-2 inline-block text-3xl italic tracking-wide text-[#111827] drop-shadow-[0_0_10px_rgba(61,236,255,0.12)] md:text-5xl">
+                        nyandere&apos;s blog &gt;_&lt;
                       </h1>
-                      <p className="mt-4 max-w-lg text-sm leading-7 text-[#c8c1d8]">
-                        a more personal side of the site. this page keeps your boxed layout, but
-                        uses it for your own world: interests, favorite things, links, friends,
-                        and little updates that feel more like you.
-                      </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 bg-[#0f0f14] p-4 md:grid-cols-[220px_minmax(0,1fr)]">
+                <div className="grid grid-cols-1 gap-4 bg-[#f4f7f4] p-4 md:grid-cols-[220px_minmax(0,1fr)]">
                   <div id="nyandere-links" className="nyandere-box nyandere-load-in nyandere-delay-2 p-3">
-                    <div className="border border-[#4a4a52]/80 bg-[#17171f] px-3 py-2 text-lg text-[#f0edf7] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)]">
+                    <div className="border border-[#3decff]/80 bg-[#ffffff] px-3 py-2 text-lg text-[#111827] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.9)]">
                       links
                     </div>
                     <div className="mt-3 space-y-2 text-sm">
@@ -736,7 +851,7 @@ export default function App() {
                         </a>
                       ))}
                     </div>
-                    <div className="mt-4 border border-[#4a4a52]/80 bg-[#08080b] px-3 py-4 text-center text-xs uppercase tracking-[0.28em] text-[#e7e2f2]">
+                    <div className="mt-4 border border-[#3decff]/80 bg-[#3decff]/18 px-3 py-4 text-center text-xs uppercase tracking-[0.28em] text-[#111827]">
                       personal bookmarks
                     </div>
                   </div>
@@ -756,25 +871,18 @@ export default function App() {
                       id="nyandere-about"
                       className="nyandere-box overflow-hidden"
                     >
-                      <div className="border-b border-[#4a4a52]/70 bg-[#17171f] px-4 py-3">
-                        <h2 className="text-2xl font-bold italic text-[#efebf8] drop-shadow-[0_0_8px_rgba(255,255,255,0.16)]">
+                      <div className="border-b border-[#3decff]/50 bg-[#ffffff] px-4 py-3">
+                        <h2 className="text-2xl font-bold italic text-[#111827] drop-shadow-[0_0_8px_rgba(61,236,255,0.14)]">
                           about me
                         </h2>
                       </div>
-                      <div className="space-y-4 px-4 py-4 text-sm leading-7 text-[#d5d0e3]">
+                      <div className="space-y-4 px-4 py-4 text-sm leading-7 text-[#425466]">
                         <p>
                           i can spend all night playing overwatch, looping the same songs i love,
                           and getting way too attached to visual novels. i love cats most of all,
                           especially my cat pearl, and i want this page to feel like a small
                           personal space filled with the things that make me happiest.
                         </p>
-                        <div className="nyandere-note p-4 text-[#e4deef]">
-                          <p className="text-sm">page direction</p>
-                          <p className="mt-2 text-sm leading-6">
-                            next passes can add your own images, blinkies, stamps, diary entries,
-                            custom links, and dedicated boxes for music, friends, and collections.
-                          </p>
-                        </div>
                       </div>
                     </motion.div>
 
@@ -792,9 +900,8 @@ export default function App() {
                       id="nyandere-socials"
                       className="nyandere-box p-4"
                     >
-                      <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-[#c8c1db]/80">
+                      <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-[#111827]/80">
                         <span>socials</span>
-                        <span>preview</span>
                       </div>
                       <div className="grid gap-3 md:grid-cols-2">
                         {[
@@ -805,15 +912,15 @@ export default function App() {
                         ].map((item) => (
                           <a
                             key={item.label}
-                            className="nyandere-social-card border border-[#4a4a52]/80 bg-[#0d0d12] px-4 py-3"
+                            className="nyandere-social-card border border-[#3decff]/80 bg-[#3decff]/14 px-4 py-3"
                             href={item.href}
                             target="_blank"
                             rel="noreferrer"
                           >
-                            <p className="text-[10px] uppercase tracking-[0.28em] text-[#c8c1db]/80">
+                            <p className="text-[10px] uppercase tracking-[0.28em] text-[#111827]/80">
                               {item.label}
                             </p>
-                            <p className="mt-2 text-[#f0edf7]">{item.value}</p>
+                            <p className="mt-2 text-[#111827]">{item.value}</p>
                           </a>
                         ))}
                       </div>
@@ -833,20 +940,37 @@ export default function App() {
                       id="nyandere-friends"
                       className="nyandere-box p-4"
                     >
-                      <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-[#c8c1db]/80">
+                      <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-[#f4efe6]/80">
                         <span>friends</span>
-                        <span>circle</span>
                       </div>
-                      <div className="grid gap-3 md:grid-cols-2">
-                        {["dylan", "shad", "jace", "arely", "jazzy"].map((name) => (
-                          <div
-                            key={name}
-                            className="border border-[#4a4a52]/80 bg-[#0d0d12] px-4 py-3 text-[#f0edf7]"
-                          >
-                            {name}
-                          </div>
-                        ))}
-                      </div>
+                        <div className="grid gap-3 md:grid-cols-2">
+                          {[
+                            { name: "dylan", href: "https://kuudere.cc" },
+                            { name: "shad" },
+                            { name: "jace" },
+                            { name: "niko" },
+                            { name: "jazzie" },
+                          ].map((friend) =>
+                            friend.href ? (
+                              <a
+                                key={friend.name}
+                                href={friend.href}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="nyandere-friend-card border border-[#3decff]/80 bg-[#3decff]/14 px-4 py-3 text-[#111827] no-underline"
+                              >
+                                {friend.name}
+                              </a>
+                            ) : (
+                              <div
+                                key={friend.name}
+                                className="nyandere-friend-card border border-[#3decff]/80 bg-[#3decff]/14 px-4 py-3 text-[#111827]"
+                              >
+                                {friend.name}
+                              </div>
+                            ),
+                          )}
+                        </div>
                     </motion.div>
 
                     <motion.div
@@ -856,11 +980,11 @@ export default function App() {
                       className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px]"
                     >
                       <div id="nyandere-gallery" className="nyandere-box p-4">
-                        <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-[#c8c1db]/80">
+                        <div className="mb-3 flex items-center justify-between text-xs uppercase tracking-[0.28em] text-[#111827]/80">
                           <span>profile card</span>
                           <span>live status</span>
                         </div>
-                        <div className="min-h-[240px] border border-dashed border-[#4a4a52]/80 bg-[#0d0d12] p-4 text-sm text-[#d7d1e6]">
+                        <div className="min-h-[240px] border border-dashed border-[#3decff]/80 bg-[#ffffff] p-4 text-sm text-[#111827]">
                           <div className="space-y-4">
                             <div className="flex items-start gap-4">
                               <div className="w-20 shrink-0">
@@ -868,28 +992,28 @@ export default function App() {
                                 <img
                                   src={nyandereAvatar}
                                   alt="Discord avatar"
-                                  className="aspect-square w-full border border-[#4a4a52]/80 object-cover"
+                                  className="aspect-square w-full border border-[#dfeef2]/70 object-cover"
                                 />
                               ) : (
-                                <div className="flex aspect-square w-full items-center justify-center border border-[#4a4a52]/80 bg-[#111117] text-xs uppercase tracking-[0.28em] text-[#c8c1db]">
+                                <div className="flex aspect-square w-full items-center justify-center border border-[#3decff]/80 bg-[#ffffff] text-xs uppercase tracking-[0.28em] text-[#111827]">
                                   offline
                                 </div>
                               )}
                               </div>
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
-                                  <h3 className="text-xl text-[#f0edf7]">
+                                  <h3 className="text-xl text-[#111827]">
                                     {nyandereLanyard?.discord_user?.global_name || nyandereLanyard?.discord_user?.username || "tpm"}
                                   </h3>
                                   <span className={`text-[10px] uppercase tracking-[0.28em] ${nyandereStatusColor}`}>
                                     {nyandereStatus}
                                   </span>
                                 </div>
-                                <p className="mt-1 text-sm text-[#c8c1d8]">
+                                <p className="mt-1 text-sm text-[#425466]">
                                   @{nyandereLanyard?.discord_user?.username || "xtpm"}
                                 </p>
                                 {nyandereCustomStatus?.state && (
-                                  <p className="mt-2 line-clamp-2 leading-6 text-[#efebf8]">
+                                  <p className="mt-2 line-clamp-2 leading-6 text-[#111827]">
                                     {nyandereCustomStatus.state}
                                   </p>
                                 )}
@@ -897,25 +1021,37 @@ export default function App() {
                             </div>
 
                             {nyandereSpotify ? (
-                              <div className="border border-[#4a4a52]/80 bg-[#111117] p-3">
-                                <p className="text-[10px] uppercase tracking-[0.28em] text-[#c8c1db]/80">
+                              <div className="border border-[#3decff]/80 bg-[#3decff]/12 p-3">
+                                <p className="text-[10px] uppercase tracking-[0.28em] text-[#111827]/70">
                                   now playing
                                 </p>
                                 <div className="mt-2 flex items-center gap-3">
                                   <img
                                     src={nyandereSpotify.album_art_url}
                                     alt="Album art"
-                                    className="h-12 w-12 border border-[#4a4a52]/80 object-cover"
+                                    className="h-12 w-12 border border-[#dfeef2]/70 object-cover"
                                   />
                                   <div className="min-w-0">
-                                    <p className="truncate text-[#f0edf7]">{nyandereSpotify.song}</p>
-                                    <p className="truncate text-[#c8c1d8]">{nyandereSpotify.artist}</p>
+                                    <p className="truncate text-[#111827]">{nyandereSpotify.song}</p>
+                                    <p className="truncate text-[#425466]">{nyandereSpotify.artist}</p>
+                                  </div>
+                                </div>
+                                <div className="mt-3">
+                                  <div className="h-1.5 w-full overflow-hidden bg-[#d8faff]">
+                                    <div
+                                      className="h-full bg-[#3decff]"
+                                      style={{ width: `${nyandereSpotifyProgress}%` }}
+                                    />
+                                  </div>
+                                  <div className="mt-1.5 flex justify-between text-[11px] text-[#425466]">
+                                    <span>{format(nyandereSpotifyCurrent)}</span>
+                                    <span>{format(nyandereSpotifyDuration)}</span>
                                   </div>
                                 </div>
                               </div>
                             ) : nyandereActivity ? (
-                              <div className="border border-[#4a4a52]/80 bg-[#111117] p-3">
-                                <p className="text-[10px] uppercase tracking-[0.28em] text-[#c8c1db]/80">
+                              <div className="border border-[#3decff]/80 bg-[#3decff]/12 p-3">
+                                <p className="text-[10px] uppercase tracking-[0.28em] text-[#111827]/70">
                                   activity
                                 </p>
                                 <div className="mt-2 flex items-center gap-3">
@@ -923,26 +1059,26 @@ export default function App() {
                                     <img
                                       src={nyandereActivityLargeImage}
                                       alt="Activity asset"
-                                      className="h-12 w-12 border border-[#4a4a52]/80 object-cover"
+                                      className="h-12 w-12 border border-[#dfeef2]/70 object-cover"
                                     />
                                   )}
                                   <div className="min-w-0">
-                                    <p className="truncate text-[#f0edf7]">{nyandereActivity.name}</p>
+                                    <p className="truncate text-[#111827]">{nyandereActivity.name}</p>
                                     {nyandereActivity.details && (
-                                      <p className="truncate text-[#c8c1d8]">{nyandereActivity.details}</p>
+                                      <p className="truncate text-[#425466]">{nyandereActivity.details}</p>
                                     )}
                                     {nyandereActivity.state && (
-                                      <p className="truncate text-[#b7b0c7]">{nyandereActivity.state}</p>
+                                      <p className="truncate text-[#0f172a]">{nyandereActivity.state}</p>
                                     )}
                                   </div>
                                 </div>
                               </div>
                             ) : (
-                              <div className="border border-[#4a4a52]/80 bg-[#111117] p-3">
-                                <p className="text-[10px] uppercase tracking-[0.28em] text-[#c8c1db]/80">
+                              <div className="border border-[#3decff]/80 bg-[#3decff]/12 p-3">
+                                <p className="text-[10px] uppercase tracking-[0.28em] text-[#111827]/70">
                                   presence
                                 </p>
-                                <p className="mt-2 text-[#efebf8]">nothing active right now</p>
+                                <p className="mt-2 text-[#111827]">nothing active right now</p>
                               </div>
                             )}
                           </div>
@@ -950,8 +1086,8 @@ export default function App() {
                       </div>
 
                       <div id="nyandere-interests" className="nyandere-box p-4">
-                        <h3 className="text-lg text-[#f0edf7]">interests</h3>
-                        <div className="mt-3 space-y-4 text-sm leading-6 text-[#d2cbe2]">
+                        <h3 className="text-lg text-[#f4f7f4]">interests</h3>
+                        <div className="mt-3 space-y-4 text-sm leading-6 text-[#f4efe6]">
                           <p>overwatch</p>
                           <p>roblox</p>
                           <p>visual novels</p>
@@ -965,9 +1101,6 @@ export default function App() {
 
                 </div>
 
-                <div className="border-t border-[#4a4a52]/70 bg-[#08080b] px-6 py-4 text-center text-xs uppercase tracking-[0.3em] text-[#d8d2e7]">
-                  nyandere outline preview
-                </div>
               </div>
             </div>
           </div>

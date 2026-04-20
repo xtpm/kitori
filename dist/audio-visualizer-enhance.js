@@ -92,6 +92,13 @@ function getNyandereAvatarUrl(discordUser) {
   return `https://cdn.discordapp.com/embed/avatars/${fallbackIndex}.png`;
 }
 
+function formatNyandereDuration(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+}
+
 
 function renderNyanderePresenceCard(data) {
   const shell = document.getElementById("nyandere-lanyard-card");
@@ -106,6 +113,11 @@ function renderNyanderePresenceCard(data) {
   const richActivity = profile?.activities?.find((activity) => activity.type === 0);
   const spotify = profile?.spotify;
   const status = profile?.discord_status || "offline";
+  const spotifyStart = spotify?.timestamps?.start ?? null;
+  const spotifyEnd = spotify?.timestamps?.end ?? null;
+  const spotifyDuration = spotifyStart && spotifyEnd ? Math.max(spotifyEnd - spotifyStart, 0) : 0;
+  const spotifyElapsed = spotifyStart && spotifyEnd ? Math.max(0, Math.min(Date.now() - spotifyStart, spotifyDuration)) : 0;
+  const spotifyProgress = spotifyDuration > 0 ? (spotifyElapsed / spotifyDuration) * 100 : 0;
   const activityImage = getNyandereActivityAssetUrl(
     richActivity?.application_id,
     richActivity?.assets?.large_image,
@@ -117,19 +129,19 @@ function renderNyanderePresenceCard(data) {
         <div style="width:80px;flex-shrink:0;">
           ${
             avatar
-              ? `<img src="${avatar}" alt="Discord avatar" style="width:100%;aspect-ratio:1/1;object-fit:cover;border:1px solid rgba(74,74,82,0.88);" />`
-              : `<div style="display:flex;align-items:center;justify-content:center;aspect-ratio:1/1;border:1px solid rgba(74,74,82,0.88);background:#111117;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8c1db;">offline</div>`
+              ? `<img src="${avatar}" alt="Discord avatar" style="width:100%;aspect-ratio:1/1;object-fit:cover;border:1px solid rgba(61,236,255,0.82);" />`
+              : `<div style="display:flex;align-items:center;justify-content:center;aspect-ratio:1/1;border:1px solid rgba(61,236,255,0.82);background:#ffffff;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#111827;">offline</div>`
           }
         </div>
         <div style="min-width:0;flex:1;">
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-            <div style="font-size:22px;line-height:1;color:#f0edf7;">${discordUser?.global_name || discordUser?.username || "tpm"}</div>
+            <div style="font-size:22px;line-height:1;color:#111827;">${discordUser?.global_name || discordUser?.username || "tpm"}</div>
             <span style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:${getNyandereStatusColor(status)};">${status}</span>
           </div>
-          <div style="margin-top:6px;color:#c8c1d8;">@${discordUser?.username || "xtpm"}</div>
+          <div style="margin-top:6px;color:#425466;">@${discordUser?.username || "xtpm"}</div>
           ${
             customStatus?.state
-              ? `<div style="margin-top:10px;line-height:1.7;color:#efebf8;">${customStatus.state}</div>`
+              ? `<div style="margin-top:10px;line-height:1.7;color:#111827;">${customStatus.state}</div>`
               : ""
           }
         </div>
@@ -137,43 +149,52 @@ function renderNyanderePresenceCard(data) {
 
       ${
         spotify
-          ? `<div style="border:1px solid rgba(74,74,82,0.88);background:#111117;padding:12px;">
-              <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,193,219,0.8);">now playing</div>
+          ? `<div style="border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.12);padding:12px;">
+              <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(17,24,39,0.7);">now playing</div>
               <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
-                <img src="${spotify.album_art_url}" alt="Album art" style="width:48px;height:48px;object-fit:cover;border:1px solid rgba(74,74,82,0.88);" />
+                <img src="${spotify.album_art_url}" alt="Album art" style="width:48px;height:48px;object-fit:cover;border:1px solid rgba(61,236,255,0.82);" />
                 <div style="min-width:0;">
-                  <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f0edf7;">${spotify.song}</div>
-                  <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c8c1d8;">${spotify.artist}</div>
+                  <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111827;">${spotify.song}</div>
+                  <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#425466;">${spotify.artist}</div>
+                </div>
+              </div>
+              <div style="margin-top:12px;">
+                <div style="height:6px;width:100%;overflow:hidden;background:#d8faff;">
+                  <div style="height:100%;width:${spotifyProgress}%;background:#3decff;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:#425466;">
+                  <span>${formatNyandereDuration(spotifyElapsed)}</span>
+                  <span>${formatNyandereDuration(spotifyDuration)}</span>
                 </div>
               </div>
             </div>`
           : richActivity
-            ? `<div style="border:1px solid rgba(74,74,82,0.88);background:#111117;padding:12px;">
-                <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,193,219,0.8);">activity</div>
+            ? `<div style="border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.12);padding:12px;">
+                <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(17,24,39,0.7);">activity</div>
                 <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
                   ${
                     activityImage
-                      ? `<img src="${activityImage}" alt="Activity asset" style="width:48px;height:48px;object-fit:cover;border:1px solid rgba(74,74,82,0.88);" />`
+                      ? `<img src="${activityImage}" alt="Activity asset" style="width:48px;height:48px;object-fit:cover;border:1px solid rgba(61,236,255,0.82);" />`
                       : ""
                   }
                   <div style="min-width:0;">
-                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#f0edf7;">${richActivity.name || "Active now"}</div>
+                    <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111827;">${richActivity.name || "Active now"}</div>
                     ${
                       richActivity.details
-                        ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c8c1d8;">${richActivity.details}</div>`
+                        ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#425466;">${richActivity.details}</div>`
                         : ""
                     }
                     ${
                       richActivity.state
-                        ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#b7b0c7;">${richActivity.state}</div>`
+                        ? `<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0f172a;">${richActivity.state}</div>`
                         : ""
                     }
                   </div>
                 </div>
               </div>`
-            : `<div style="border:1px solid rgba(74,74,82,0.88);background:#111117;padding:12px;">
-                <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,193,219,0.8);">presence</div>
-                <div style="margin-top:8px;color:#efebf8;">nothing active right now</div>
+            : `<div style="border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.12);padding:12px;">
+                <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(17,24,39,0.7);">presence</div>
+                <div style="margin-top:8px;color:#111827;">nothing active right now</div>
               </div>`
       }
     </div>
@@ -217,18 +238,102 @@ function renderNyandereOutline() {
     const style = document.createElement("style");
     style.id = styleId;
     style.textContent = `
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap');
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@600&display=swap');
       body {
+        --ny-bg: #f4f7f4;
+        --ny-panel: #ffffff;
+        --ny-surface: #ffffff;
+        --ny-surface-soft: #ffffff;
+        --ny-tab: #3decff;
+        --ny-border: #3decff;
+        --ny-text: #111827;
+        --ny-muted: #425466;
         margin: 0;
         font-family: "Inter", sans-serif;
         font-weight: 600;
-        background: #050506;
-        color: #ffffff;
+        background: var(--ny-bg);
+        color: var(--ny-text);
         scroll-behavior: smooth;
       }
       .nyandere-preview-shell {
         min-height: 100vh;
         padding: 32px 16px;
+        position: relative;
+        overflow: hidden;
+      }
+      @keyframes nyandereOpeningWash {
+        0% {
+          opacity: 0.95;
+          transform: scaleY(1);
+        }
+        65% {
+          opacity: 0.42;
+        }
+        100% {
+          opacity: 0;
+          transform: scaleY(1.02);
+        }
+      }
+      @keyframes nyandereOpeningGrid {
+        0% {
+          opacity: 0;
+          transform: translateY(-24px);
+        }
+        18% {
+          opacity: 0.45;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(36px);
+        }
+      }
+      @keyframes nyandereOpeningGlow {
+        0% {
+          opacity: 0;
+          transform: scale(0.98);
+        }
+        30% {
+          opacity: 0.35;
+        }
+        100% {
+          opacity: 0;
+          transform: scale(1.04);
+        }
+      }
+      .nyandere-opening-layer {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        overflow: hidden;
+      }
+      .nyandere-opening-wash {
+        position: absolute;
+        inset: 0;
+        background:
+          linear-gradient(180deg, rgba(61,236,255,0.28), rgba(61,236,255,0.08) 32%, rgba(255,255,255,0) 72%),
+          radial-gradient(circle at 18% 12%, rgba(61,236,255,0.28), transparent 38%);
+        transform-origin: top center;
+        animation: nyandereOpeningWash 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .nyandere-opening-grid {
+        position: absolute;
+        inset: -10% 0 0;
+        background-image:
+          linear-gradient(rgba(61,236,255,0.22) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(61,236,255,0.14) 1px, transparent 1px);
+        background-size: 100% 28px, 28px 100%;
+        mix-blend-mode: screen;
+        animation: nyandereOpeningGrid 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      }
+      .nyandere-opening-glow {
+        position: absolute;
+        inset: 8% 10%;
+        border: 1px solid rgba(61,236,255,0.26);
+        box-shadow:
+          0 0 48px rgba(61,236,255,0.16),
+          inset 0 0 36px rgba(61,236,255,0.08);
+        animation: nyandereOpeningGlow 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
       @keyframes nyanderePreviewFadeRise {
         from {
@@ -246,26 +351,26 @@ function renderNyandereOutline() {
         will-change: opacity, transform;
       }
       .nyandere-preview-delay-1 {
-        animation-delay: 0.08s;
-      }
-      .nyandere-preview-delay-2 {
         animation-delay: 0.18s;
       }
-      .nyandere-preview-delay-3 {
+      .nyandere-preview-delay-2 {
         animation-delay: 0.28s;
       }
+      .nyandere-preview-delay-3 {
+        animation-delay: 0.42s;
+      }
       .nyandere-preview-delay-4 {
-        animation-delay: 0.38s;
+        animation-delay: 0.56s;
       }
       .nyandere-preview-panel {
         max-width: 1120px;
         margin: 0 auto;
-        border: 1px solid rgba(74,74,82,0.82);
-        background: #0b0b0f;
+        border: 1px solid rgba(61,236,255,0.92);
+        background: var(--ny-panel);
         box-shadow:
-          inset 0 0 0 1px rgba(255,255,255,0.5),
-          0 0 0 1px rgba(74,74,82,0.22),
-          0 14px 30px rgba(194,116,157,0.12);
+          inset 0 0 0 1px rgba(255,255,255,0.9),
+          0 0 0 1px rgba(61,236,255,0.22),
+          0 14px 30px rgba(61,236,255,0.14);
         padding: 24px;
       }
       .nyandere-preview-inner,
@@ -274,64 +379,86 @@ function renderNyandereOutline() {
         box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55);
       }
       .nyandere-preview-inner {
-        border: 1px solid rgba(74,74,82,0.88);
-        background: #111117;
+        border: 1px solid rgba(61,236,255,0.88);
+        background: var(--ny-surface-soft);
         overflow: hidden;
       }
       .nyandere-preview-banner {
         position: relative;
         min-height: 210px;
-        padding: 32px 40px 20px;
-        border-bottom: 1px solid rgba(183, 176, 199, 0.32);
-        background: #0b0b0f;
+        padding: 44px 40px 20px;
+        border-bottom: 1px solid rgba(61, 236, 255, 0.42);
+        background: #ffffff;
       }
       .nyandere-preview-banner-grid {
         position: relative;
         z-index: 1;
         display: flex;
-        flex-wrap: wrap;
-        gap: 24px;
-        justify-content: space-between;
-        align-items: flex-end;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
       }
       .nyandere-preview-kicker {
         font-size: 11px;
         letter-spacing: 0.35em;
-        text-transform: uppercase;
+        text-transform: none;
         color: rgba(200, 193, 219, 0.85);
+      }
+      @keyframes nyanderePreviewRgbShift {
+        0% {
+          color: #ff4d4d;
+          text-shadow: 0 0 8px rgba(255,77,77,0.22);
+        }
+        33% {
+          color: #ffd24d;
+          text-shadow: 0 0 8px rgba(255,210,77,0.22);
+        }
+        66% {
+          color: #4dd2ff;
+          text-shadow: 0 0 8px rgba(77,210,255,0.22);
+        }
+        100% {
+          color: #b84dff;
+          text-shadow: 0 0 8px rgba(184,77,255,0.22);
+        }
+      }
+      .nyandere-preview-kicker-rgb {
+        animation: nyanderePreviewRgbShift 6s linear infinite;
       }
       .nyandere-preview-title {
         display: inline-block;
-        margin-top: 12px;
-        font-size: clamp(42px, 5vw, 68px);
+        margin-top: 88px;
+        transform: translateX(-10px);
+        font-size: clamp(32px, 4vw, 52px);
         font-style: italic;
-        font-family: "Inter", sans-serif;
-        font-weight: 600;
-        letter-spacing: 0.03em;
+        font-family: "Cormorant Garamond", serif;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+        line-height: 0.95;
         background: none;
         -webkit-background-clip: text;
         background-clip: text;
-        color: #f0edf7;
-        filter: drop-shadow(0 0 10px rgba(255,255,255,0.08));
+        color: var(--ny-text);
+        filter: drop-shadow(0 0 10px rgba(244,247,244,0.08));
       }
       .nyandere-preview-copy {
         max-width: 520px;
         margin-top: 16px;
         font-size: 14px;
         line-height: 1.9;
-        color: #c8c1d8;
+        color: var(--ny-muted);
       }
       .nyandere-preview-shell,
       .nyandere-preview-shell * {
         font-family: "Inter", sans-serif;
         font-weight: 600;
-        color: #ffffff;
+        color: var(--ny-text);
       }
       .nyandere-preview-note-panel,
       .nyandere-preview-box,
       .nyandere-preview-tab {
-        border: 1px solid rgba(74,74,82,0.88);
-        background: #111117;
+        border: 1px solid rgba(223,238,242,0.72);
+        background: var(--ny-surface-soft);
       }
       .nyandere-preview-note-panel {
         width: 240px;
@@ -339,15 +466,15 @@ function renderNyandereOutline() {
         padding: 16px;
         font-size: 12px;
         line-height: 1.8;
-        color: #d2cbe2;
+        color: var(--ny-muted);
       }
       .nyandere-preview-tabs {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
         gap: 8px;
         padding: 10px 12px;
-        border-bottom: 1px solid rgba(183, 176, 199, 0.32);
-        background: #0b0b0f;
+        border-bottom: 1px solid rgba(223, 238, 242, 0.32);
+        background: var(--ny-bg);
       }
       .nyandere-preview-tab {
         padding: 10px 12px;
@@ -355,8 +482,8 @@ function renderNyandereOutline() {
         text-transform: uppercase;
         font-size: 11px;
         letter-spacing: 0.2em;
-        color: #d1cbe0;
-        background: #0d0d12;
+        color: var(--ny-text);
+        background: rgba(61,236,255,0.18);
       }
       .nyandere-preview-tab-link {
         display: block;
@@ -377,9 +504,9 @@ function renderNyandereOutline() {
         padding: 10px 12px;
         font-size: 28px;
         line-height: 1;
-        color: #f0edf7;
-        background: #17171f;
-        border: 1px solid rgba(74,74,82,0.88);
+        color: var(--ny-text);
+        background: var(--ny-panel);
+        border: 1px solid rgba(223,238,242,0.72);
       }
       .nyandere-preview-list {
         margin-top: 12px;
@@ -389,16 +516,16 @@ function renderNyandereOutline() {
       }
       .nyandere-preview-list div {
         padding: 10px 12px;
-        color: #d8d2e7;
-        border: 1px solid rgba(74,74,82,0.88);
-        background: #0d0d12;
+        color: var(--ny-text);
+        border: 1px solid rgba(61,236,255,0.82);
+        background: #ffffff;
       }
       .nyandere-preview-list a {
         display: block;
         padding: 10px 12px;
-        color: #d8d2e7 !important;
-        border: 1px solid rgba(74,74,82,0.88);
-        background: #0d0d12;
+        color: var(--ny-text) !important;
+        border: 1px solid rgba(61,236,255,0.82);
+        background: rgba(61,236,255,0.08);
         text-decoration: none;
         transition:
           transform 0.18s ease,
@@ -408,9 +535,9 @@ function renderNyandereOutline() {
       }
       .nyandere-preview-list a:hover {
         transform: translateX(4px);
-        border-color: rgba(160,160,172,0.92);
-        background: #14141b;
-        color: #ffffff !important;
+        border-color: rgba(61,236,255,1);
+        background: rgba(61,236,255,0.18);
+        color: var(--ny-text) !important;
       }
       .nyandere-preview-social-card {
         transition:
@@ -421,9 +548,22 @@ function renderNyandereOutline() {
       }
       .nyandere-preview-social-card:hover {
         transform: translateY(-3px);
-        border-color: rgba(206,184,255,0.95) !important;
-        background: #14141b !important;
-        box-shadow: 0 0 16px rgba(206,184,255,0.28);
+        border-color: rgba(61,236,255,1) !important;
+        background: rgba(61,236,255,0.18) !important;
+        box-shadow: 0 0 18px rgba(61,236,255,0.24);
+      }
+      .nyandere-preview-friend-card {
+        transition:
+          transform 0.35s ease,
+          border-color 0.35s ease,
+          background-color 0.35s ease,
+          box-shadow 0.35s ease;
+      }
+      .nyandere-preview-friend-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(61,236,255,1) !important;
+        background: rgba(61,236,255,0.18) !important;
+        box-shadow: 0 0 18px rgba(61,236,255,0.24);
       }
       .nyandere-preview-center {
         display: grid;
@@ -434,28 +574,28 @@ function renderNyandereOutline() {
       }
       .nyandere-preview-welcome-head {
         padding: 12px 16px;
-        border-bottom: 1px solid rgba(183, 176, 199, 0.6);
-        background: #17171f;
+        border-bottom: 1px solid rgba(61, 236, 255, 0.5);
+        background: #ffffff;
       }
       .nyandere-preview-welcome-head h2 {
         margin: 0;
-        color: #f0edf7;
+        color: var(--ny-text);
         font-size: 30px;
         font-style: italic;
-        filter: drop-shadow(0 0 8px rgba(255,255,255,0.16));
+        filter: drop-shadow(0 0 8px rgba(244,247,244,0.16));
       }
       .nyandere-preview-welcome-body {
         padding: 16px;
-        color: #d5d0e3;
+        color: var(--ny-muted);
         font-size: 14px;
         line-height: 1.9;
       }
       .nyandere-preview-dashed {
         margin-top: 16px;
-        border: 2px dashed rgba(74,74,82,0.9);
-        background: #0d0d12;
+        border: 2px dashed rgba(61,236,255,0.6);
+        background: rgba(61,236,255,0.08);
         padding: 16px;
-        color: #e4deef;
+        color: var(--ny-muted);
       }
       .nyandere-preview-lower {
         display: grid;
@@ -466,14 +606,14 @@ function renderNyandereOutline() {
         min-height: 240px;
         font-size: 14px;
         line-height: 1.9;
-        color: #d7d1e6;
-        border: 1px dashed rgba(74,74,82,0.88);
-        background: #0d0d12;
+        color: var(--ny-muted);
+        border: 1px dashed rgba(223,238,242,0.72);
+        background: rgba(127,128,153,0.18);
         padding: 20px;
       }
       .nyandere-preview-micro h3 {
         margin: 0;
-        color: #f0edf7;
+        color: var(--ny-text);
         font-size: 18px;
       }
       .nyandere-preview-footer {
@@ -499,19 +639,19 @@ function renderNyandereOutline() {
 
   root.innerHTML = `
     <div class="nyandere-preview-shell">
-      <div class="nyandere-preview-panel nyandere-preview-load-in">
+      <div class="nyandere-opening-layer">
+        <div class="nyandere-opening-wash"></div>
+        <div class="nyandere-opening-grid"></div>
+        <div class="nyandere-opening-glow"></div>
+      </div>
+      <div class="nyandere-preview-panel nyandere-preview-load-in" style="position:relative;z-index:1;">
         <div class="nyandere-preview-inner">
           <div class="nyandere-preview-banner" id="nyandere-index">
             <div class="nyandere-preview-banner-grid">
-              <div>
-                <div class="nyandere-preview-kicker">personal page</div>
-                <div class="nyandere-preview-title">NYANDERE.LOG</div>
-                <div class="nyandere-preview-copy">
-                  a more personal side of the site. this page keeps your boxed layout, but
-                  uses it for your own world: interests, favorite things, links, friends,
-                  and little updates that feel more like you.
+                <div>
+                  <div class="nyandere-preview-kicker nyandere-preview-kicker-rgb">/nyandere</div>
+                  <div class="nyandere-preview-title">nyandere's blog &gt;_&lt;</div>
                 </div>
-              </div>
             </div>
           </div>
 
@@ -524,7 +664,7 @@ function renderNyandereOutline() {
                 <a href="#nyandere-friends">friends</a>
                 <a href="#nyandere-gallery">extra</a>
               </div>
-              <div style="margin-top:16px;border:1px solid rgba(74,74,82,0.88);background:#08080b;padding:16px;text-align:center;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#e7e2f2;">
+              <div style="margin-top:16px;border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.18);padding:16px;text-align:center;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#111827;">
                 personal bookmarks
               </div>
             </div>
@@ -541,56 +681,49 @@ function renderNyandereOutline() {
                     and i want this page to feel like a small personal space filled with the things that
                     make me happiest.
                   </div>
-                  <div class="nyandere-preview-dashed">
-                    page direction<br><br>
-                    next passes can add your own images, blinkies, stamps, diary entries, custom links,
-                    and dedicated boxes for music, friends, and collections.
-                  </div>
                 </div>
               </div>
 
               <div class="nyandere-preview-box" id="nyandere-socials">
-                <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8c1db;">
+                <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#111827;">
                   <span>socials</span>
-                  <span>preview</span>
                 </div>
                 <div style="display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));">
-                  <a class="nyandere-preview-social-card" href="https://www.tiktok.com/@webentries" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;text-decoration:none;">
-                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,193,219,0.8);">tiktok</div>
-                    <div style="margin-top:8px;color:#f0edf7;">@webentries</div>
+                  <a class="nyandere-preview-social-card" href="https://www.tiktok.com/@webentries" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;text-decoration:none;">
+                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(17,24,39,0.8);">tiktok</div>
+                    <div style="margin-top:8px;color:#111827;">@webentries</div>
                   </a>
-                  <a class="nyandere-preview-social-card" href="https://www.instagram.com/daintycatgirl/" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;text-decoration:none;">
-                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,193,219,0.8);">instagram</div>
-                    <div style="margin-top:8px;color:#f0edf7;">@daintycatgirl</div>
+                  <a class="nyandere-preview-social-card" href="https://www.instagram.com/daintycatgirl/" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;text-decoration:none;">
+                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(17,24,39,0.8);">instagram</div>
+                    <div style="margin-top:8px;color:#111827;">@daintycatgirl</div>
                   </a>
-                  <a class="nyandere-preview-social-card" href="https://x.com/daintycatgirl" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;text-decoration:none;">
-                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,193,219,0.8);">twitter</div>
-                    <div style="margin-top:8px;color:#f0edf7;">@daintycatgirl</div>
+                  <a class="nyandere-preview-social-card" href="https://x.com/daintycatgirl" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;text-decoration:none;">
+                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(17,24,39,0.8);">twitter</div>
+                    <div style="margin-top:8px;color:#111827;">@daintycatgirl</div>
                   </a>
-                  <a class="nyandere-preview-social-card" href="https://t.me/fawndere" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;text-decoration:none;">
-                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(200,193,219,0.8);">telegram</div>
-                    <div style="margin-top:8px;color:#f0edf7;">@fawndere</div>
+                  <a class="nyandere-preview-social-card" href="https://t.me/fawndere" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;text-decoration:none;">
+                    <div style="font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:rgba(17,24,39,0.8);">telegram</div>
+                    <div style="margin-top:8px;color:#111827;">@fawndere</div>
                   </a>
                 </div>
               </div>
 
               <div class="nyandere-preview-box" id="nyandere-friends">
-                <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8c1db;">
+                <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#f4efe6;">
                   <span>friends</span>
-                  <span>circle</span>
                 </div>
                 <div style="display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr));">
-                  <div style="border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;color:#f0edf7;">dylan</div>
-                  <div style="border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;color:#f0edf7;">shad</div>
-                  <div style="border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;color:#f0edf7;">jace</div>
-                  <div style="border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;color:#f0edf7;">arely</div>
-                  <div style="border:1px solid rgba(74,74,82,0.88);background:#0d0d12;padding:12px 16px;color:#f0edf7;">jazzy</div>
+                  <a class="nyandere-preview-friend-card" href="https://kuudere.cc" target="_blank" rel="noreferrer" style="display:block;border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;color:#111827;text-decoration:none;">dylan</a>
+                  <div class="nyandere-preview-friend-card" style="border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;color:#111827;">shad</div>
+                  <div class="nyandere-preview-friend-card" style="border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;color:#111827;">jace</div>
+                  <div class="nyandere-preview-friend-card" style="border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;color:#111827;">niko</div>
+                  <div class="nyandere-preview-friend-card" style="border:1px solid rgba(61,236,255,0.82);background:rgba(61,236,255,0.14);padding:12px 16px;color:#111827;">jazzie</div>
                 </div>
               </div>
 
               <div class="nyandere-preview-lower">
                 <div class="nyandere-preview-box" id="nyandere-gallery">
-                  <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#c8c1db;">
+                  <div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:#f4efe6;">
                     <span>profile card</span>
                     <span>live status</span>
                   </div>
@@ -601,7 +734,7 @@ function renderNyandereOutline() {
 
                 <div class="nyandere-preview-box nyandere-preview-micro" id="nyandere-interests">
                   <h3>interests</h3>
-                  <div style="margin-top:12px;display:grid;gap:12px;font-size:14px;line-height:1.7;color:#7b5c6e;">
+                  <div style="margin-top:12px;display:grid;gap:12px;font-size:14px;line-height:1.7;color:#f4efe6;">
                     <div>overwatch</div>
                     <div>roblox</div>
                     <div>visual novels</div>
@@ -613,7 +746,6 @@ function renderNyandereOutline() {
             </div>
           </div>
 
-          <div class="nyandere-preview-footer">nyandere outline preview</div>
         </div>
       </div>
     </div>
