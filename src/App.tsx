@@ -1412,32 +1412,50 @@ export default function App() {
                           </div>
 
                           <div>
-                        <p className="text-red-400 mb-2 inline-block [text-shadow:0_0_10px_rgba(248,113,113,0.35)]">
+                        <p className="mb-2 inline-block text-pink-200 [text-shadow:0_0_10px_rgba(251,207,232,0.55)]">
                           .gg/bunnie
                         </p>
                             <div className="space-y-1">
-                              {["serena", "shad", "jace"].map((name) => (
-                                <motion.div
-                                  key={name}
-                                  whileHover={{ x: 6, scale: 1.02 }}
-                                  transition={{ duration: 0.18, ease: "easeOut" }}
-                                  className="px-2 py-1 rounded hover:bg-zinc-800/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] transition-all"
-                                >
-                                  <span
-                                    className={
-                                      name === "serena"
-                                        ? "text-pink-200 inline-block [text-shadow:0_0_10px_rgba(251,207,232,0.55)]"
-                                        : name === "shad"
+                              {[
+                                { name: "serena", href: "https://kuudere.cc/nyandere" },
+                                { name: "shad" },
+                                { name: "jace" },
+                              ].map((friend) =>
+                                friend.href ? (
+                                  <motion.a
+                                    key={friend.name}
+                                    href={friend.href}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    whileHover={{ x: 6, scale: 1.02 }}
+                                    transition={{ duration: 0.18, ease: "easeOut" }}
+                                    className="block px-2 py-1 rounded hover:bg-zinc-800/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] transition-all no-underline"
+                                  >
+                                    <span className="text-pink-200 inline-block [text-shadow:0_0_10px_rgba(251,207,232,0.55)]">
+                                      {friend.name}
+                                    </span>
+                                  </motion.a>
+                                ) : (
+                                  <motion.div
+                                    key={friend.name}
+                                    whileHover={{ x: 6, scale: 1.02 }}
+                                    transition={{ duration: 0.18, ease: "easeOut" }}
+                                    className="px-2 py-1 rounded hover:bg-zinc-800/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] transition-all"
+                                  >
+                                    <span
+                                      className={
+                                        friend.name === "shad"
                                           ? "inline-block [color:#c24a2c] [text-shadow:0_0_10px_rgba(194,74,44,0.5)]"
-                                          : name === "jace"
+                                          : friend.name === "jace"
                                             ? "text-lime-300 inline-block [text-shadow:0_0_10px_rgba(190,242,100,0.5)]"
                                             : "text-white"
-                                    }
-                                  >
-                                    {name}
-                                  </span>
-                                </motion.div>
-                              ))}
+                                      }
+                                    >
+                                      {friend.name}
+                                    </span>
+                                  </motion.div>
+                                ),
+                              )}
                             </div>
                           </div>
 
