@@ -595,7 +595,6 @@ export default function App() {
           background: #f4f7f4;
           scroll-behavior: smooth;
         }
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Inter:wght@600&display=swap');
         .nyandere-sky {
           --ny-bg: #f4f7f4;
           --ny-panel: #ffffff;
