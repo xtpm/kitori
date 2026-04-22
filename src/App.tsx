@@ -28,6 +28,7 @@ export default function App() {
     Array.from({ length: 20 }, () => 0.14),
   );
   const [nyanderePinnedSection, setNyanderePinnedSection] = useState<"default" | "socials" | "friends">("default");
+  const [activeFriendGroup, setActiveFriendGroup] = useState("tohka.net");
 
   const backgroundTracks = [
     {
@@ -84,6 +85,82 @@ export default function App() {
       panelMeta: "era: archived",
     },
   ];
+
+  const friendGroups = [
+    {
+      id: "terry davis fanclub",
+      label: "terry davis fanclub",
+      accentClass: "inline-block",
+      accentStyle: {
+        color: "#fef08a",
+        textShadow: "0 0 10px rgba(254,240,138,0.55)",
+      },
+      members: [
+        {
+          name: "mke",
+          image: "/friends/mke.png",
+          className: "inline-block",
+          style: {
+            color: "#d8b4fe",
+            textShadow: "0 0 10px rgba(216,180,254,0.8), 0 0 20px rgba(216,180,254,0.35)",
+          },
+        },
+        {
+          name: "lennie",
+          image: "/friends/lennie.jpg",
+          className: "rgb-text inline-block",
+          style: {
+            textShadow: "0 0 12px rgba(255,255,255,0.28)",
+          },
+        },
+        {
+          name: "arturiafm",
+          image: "/friends/arturiafm.png",
+          className: "inline-block",
+          style: {
+            color: "#fcd34d",
+            textShadow: "0 0 10px rgba(252,211,77,0.82), 0 0 22px rgba(252,211,77,0.38)",
+          },
+        },
+      ],
+    },
+    {
+      id: ".gg/bunnie",
+      label: ".gg/bunnie",
+      accentClass:
+        "text-pink-200 [text-shadow:0_0_10px_rgba(251,207,232,0.55)]",
+      members: [
+        {
+          name: "serena",
+          image: "/friends/serena.jpg",
+          href: "https://kuudere.cc/nyandere",
+          className:
+            "text-pink-200 inline-block [text-shadow:0_0_10px_rgba(251,207,232,0.55)]",
+        },
+        {
+          name: "shad",
+          image: "/friends/shad.jpg",
+          className:
+            "inline-block [color:#c24a2c] [text-shadow:0_0_10px_rgba(194,74,44,0.5)]",
+        },
+      ],
+    },
+    {
+      id: "the niggas.",
+      label: "the niggas.",
+      accentClass:
+        "text-red-400 [text-shadow:0_0_10px_rgba(248,113,113,0.35)]",
+      members: [
+        { name: "isaac", image: "/friends/isaac.png" },
+        { name: "dash", image: "/friends/dash.png" },
+        { name: "angel", image: "/friends/angel.png" },
+        { name: "geo", image: "/friends/geo.png" },
+      ],
+    },
+  ];
+
+  const currentFriendGroup =
+    friendGroups.find((group) => group.id === activeFriendGroup) ?? friendGroups[0];
 
   useEffect(() => {
     const interval = setInterval(() => setNow(Date.now()), 1000);
@@ -1391,90 +1468,150 @@ export default function App() {
 
                       <div className="border border-zinc-800 p-4">
                         <h2 className="text-white mb-4">my friends</h2>
-
                         <div className="space-y-6 text-sm">
-                          <div>
-                            <p className="text-purple-400 mb-2 inline-block [text-shadow:0_0_10px_rgba(168,85,247,0.35)]">
-                              tohka.net
-                            </p>
-                            <div className="space-y-1">
-                              {["mke", "lennie", "arturiafm"].map((name) => (
-                                <motion.div
-                                  key={name}
-                                  whileHover={{ x: 6, scale: 1.02 }}
-                                  transition={{ duration: 0.18, ease: "easeOut" }}
-                                  className="px-2 py-1 rounded hover:text-white hover:bg-zinc-800/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] transition-all"
+                          <div className="flex flex-wrap gap-2">
+                            {friendGroups.map((group) => {
+                              const isActive = currentFriendGroup.id === group.id;
+
+                              return (
+                                <button
+                                  key={group.id}
+                                  type="button"
+                                  onClick={() => setActiveFriendGroup(group.id)}
+                                  className={`border px-2 py-1 text-left text-xs transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] active:translate-y-0 ${
+                                    isActive
+                                      ? "border-zinc-600 text-white bg-zinc-900"
+                                      : "border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900"
+                                  }`}
                                 >
-                                  <span>{name}</span>
-                                </motion.div>
-                              ))}
-                            </div>
+                                  <span className={group.accentClass} style={group.accentStyle}>
+                                    {group.label}
+                                  </span>
+                                </button>
+                              );
+                            })}
                           </div>
 
-                          <div>
-                        <p className="mb-2 inline-block text-pink-200 [text-shadow:0_0_10px_rgba(251,207,232,0.55)]">
-                          .gg/bunnie
-                        </p>
-                            <div className="space-y-1">
-                              {[
-                                { name: "serena", href: "https://kuudere.cc/nyandere" },
-                                { name: "shad" },
-                                { name: "jace" },
-                              ].map((friend) =>
-                                friend.href ? (
-                                  <motion.a
-                                    key={friend.name}
-                                    href={friend.href}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    whileHover={{ x: 6, scale: 1.02 }}
-                                    transition={{ duration: 0.18, ease: "easeOut" }}
-                                    className="block px-2 py-1 rounded hover:bg-zinc-800/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] transition-all no-underline"
-                                  >
-                                    <span className="text-pink-200 inline-block [text-shadow:0_0_10px_rgba(251,207,232,0.55)]">
-                                      {friend.name}
-                                    </span>
-                                  </motion.a>
-                                ) : (
-                                  <motion.div
-                                    key={friend.name}
-                                    whileHover={{ x: 6, scale: 1.02 }}
-                                    transition={{ duration: 0.18, ease: "easeOut" }}
-                                    className="px-2 py-1 rounded hover:bg-zinc-800/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] transition-all"
-                                  >
-                                    <span
-                                      className={
-                                        friend.name === "shad"
-                                          ? "inline-block [color:#c24a2c] [text-shadow:0_0_10px_rgba(194,74,44,0.5)]"
-                                          : friend.name === "jace"
-                                            ? "text-lime-300 inline-block [text-shadow:0_0_10px_rgba(190,242,100,0.5)]"
-                                            : "text-white"
-                                      }
+                          <div className="border border-zinc-800 p-4 min-h-[240px]">
+                            <AnimatePresence mode="wait">
+                              <motion.p
+                                key={currentFriendGroup.id}
+                                initial={{ opacity: 0, x: 14 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -14 }}
+                                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                                className={`mb-3 inline-block ${currentFriendGroup.accentClass}`}
+                                style={currentFriendGroup.accentStyle}
+                              >
+                                {currentFriendGroup.label}
+                              </motion.p>
+                            </AnimatePresence>
+
+                            <AnimatePresence mode="wait">
+                              <motion.div
+                                key={currentFriendGroup.id}
+                                initial={{ opacity: 0, x: 18 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -18 }}
+                                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                                className="flex flex-wrap gap-4"
+                              >
+                                {currentFriendGroup.members.map((friend, index) =>
+                                  friend.href ? (
+                                    <motion.a
+                                      key={friend.name}
+                                      href={friend.href}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      initial={{ opacity: 0, x: 14 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      exit={{ opacity: 0, x: -14 }}
+                                      transition={{
+                                        duration: 0.22,
+                                        delay: index * 0.04,
+                                        ease: [0.22, 1, 0.36, 1],
+                                      }}
+                                      whileHover={{ x: 6, scale: 1.02 }}
+                                      className="flex flex-col items-center gap-2 hover:opacity-100 transition-all no-underline"
                                     >
-                                      {friend.name}
-                                    </span>
-                                  </motion.div>
-                                ),
-                              )}
-                            </div>
-                          </div>
-
-                          <div>
-                            <p className="text-red-400 mb-2 inline-block [text-shadow:0_0_10px_rgba(248,113,113,0.35)]">
-                              the niggas.
-                            </p>
-                            <div className="space-y-1">
-                              {["isaac", "dash", "angel", "geo"].map((name) => (
-                                <motion.div
-                                  key={name}
-                                  whileHover={{ x: 6, scale: 1.02 }}
-                                  transition={{ duration: 0.18, ease: "easeOut" }}
-                                  className="px-2 py-1 rounded hover:text-white hover:bg-zinc-800/60 hover:shadow-[0_0_10px_rgba(255,255,255,0.08)] transition-all"
-                                >
-                                  <span>{name}</span>
-                                </motion.div>
-                              ))}
-                            </div>
+                                      {friend.image ? (
+                                        <img
+                                          src={friend.image}
+                                          alt={`${friend.name} profile`}
+                                          className="border border-zinc-700 object-cover"
+                                          style={{ width: 88, height: 88 }}
+                                        />
+                                      ) : (
+                                        <div
+                                          className="flex items-center justify-center border border-zinc-700 bg-zinc-900 text-xl uppercase text-zinc-300"
+                                          style={{ width: 88, height: 88 }}
+                                        >
+                                          {friend.name.charAt(0)}
+                                        </div>
+                                      )}
+                                      <motion.span
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -6 }}
+                                        transition={{
+                                          duration: 0.2,
+                                          delay: 0.06 + index * 0.04,
+                                          ease: [0.22, 1, 0.36, 1],
+                                        }}
+                                        className={`text-center ${friend.className ?? "text-white"}`}
+                                        style={friend.style}
+                                      >
+                                        {friend.name}
+                                      </motion.span>
+                                    </motion.a>
+                                  ) : (
+                                    <motion.div
+                                      key={friend.name}
+                                      initial={{ opacity: 0, x: 14 }}
+                                      animate={{ opacity: 1, x: 0 }}
+                                      exit={{ opacity: 0, x: -14 }}
+                                      transition={{
+                                        duration: 0.22,
+                                        delay: index * 0.04,
+                                        ease: [0.22, 1, 0.36, 1],
+                                      }}
+                                      whileHover={{ x: 6, scale: 1.02 }}
+                                      className="flex flex-col items-center gap-2 transition-all"
+                                    >
+                                      {friend.image ? (
+                                        <img
+                                          src={friend.image}
+                                          alt={`${friend.name} profile`}
+                                          className="border border-zinc-700 object-cover"
+                                          style={{ width: 88, height: 88 }}
+                                        />
+                                      ) : (
+                                        <div
+                                          className="flex items-center justify-center border border-zinc-700 bg-zinc-900 text-xl uppercase text-zinc-300"
+                                          style={{ width: 88, height: 88 }}
+                                        >
+                                          {friend.name.charAt(0)}
+                                        </div>
+                                      )}
+                                      <motion.span
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -6 }}
+                                        transition={{
+                                          duration: 0.2,
+                                          delay: 0.06 + index * 0.04,
+                                          ease: [0.22, 1, 0.36, 1],
+                                        }}
+                                        className={`text-center ${friend.className ?? "text-white"}`}
+                                        style={friend.style}
+                                      >
+                                        {friend.name}
+                                      </motion.span>
+                                    </motion.div>
+                                  ),
+                                )}
+                              </motion.div>
+                            </AnimatePresence>
                           </div>
                         </div>
                       </div>
