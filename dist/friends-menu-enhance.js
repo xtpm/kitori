@@ -157,7 +157,7 @@
     buttonColumn.className = "flex flex-wrap gap-2";
 
     const panel = document.createElement("div");
-    panel.className = "border border-zinc-800 p-4 min-h-[240px]";
+    panel.className = "border border-zinc-800 p-4";
 
     const title = document.createElement("p");
     title.className = "mb-3 inline-block";

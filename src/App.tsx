@@ -1492,7 +1492,7 @@ export default function App() {
                             })}
                           </div>
 
-                          <div className="border border-zinc-800 p-4 min-h-[240px]">
+                          <div className="border border-zinc-800 p-4">
                             <AnimatePresence mode="wait">
                               <motion.p
                                 key={currentFriendGroup.id}
