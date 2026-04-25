@@ -20,10 +20,10 @@ export default function App() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [playerProgress, setPlayerProgress] = useState(0);
   const [playerDuration, setPlayerDuration] = useState(0);
-  const [playerVolume, setPlayerVolume] = useState(0.35);
+  const [playerVolume, setPlayerVolume] = useState(0.2);
   const [visualizerBars, setVisualizerBars] = useState<number[]>(
     Array.from({ length: 20 }, () => 0.14),
   );
@@ -290,6 +290,8 @@ export default function App() {
 
     const onLoadedMetadata = () => setPlayerDuration(audio.duration || 0);
     const onTimeUpdate = () => setPlayerProgress(audio.currentTime || 0);
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
     const onEnded = () => {
       setCurrentTrackIndex((prev) => (prev + 1) % backgroundTracks.length);
       setIsPlaying(true);
@@ -297,11 +299,15 @@ export default function App() {
 
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
     audio.addEventListener("timeupdate", onTimeUpdate);
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
     audio.addEventListener("ended", onEnded);
 
     return () => {
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audio.removeEventListener("timeupdate", onTimeUpdate);
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
       audio.removeEventListener("ended", onEnded);
     };
   }, [backgroundTracks.length]);
@@ -329,6 +335,41 @@ export default function App() {
       audio.pause();
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    let cancelled = false;
+
+    const attemptAutoplay = () => {
+      if (cancelled) return;
+      setIsPlaying(true);
+      initializeVisualizer();
+      audio.play().catch(() => undefined);
+    };
+
+    const onCanPlay = () => {
+      attemptAutoplay();
+    };
+
+    const onFirstInteraction = () => {
+      attemptAutoplay();
+    };
+
+    audio.addEventListener("canplay", onCanPlay);
+    window.addEventListener("pointerdown", onFirstInteraction, { once: true });
+    window.addEventListener("keydown", onFirstInteraction, { once: true });
+
+    attemptAutoplay();
+
+    return () => {
+      cancelled = true;
+      audio.removeEventListener("canplay", onCanPlay);
+      window.removeEventListener("pointerdown", onFirstInteraction);
+      window.removeEventListener("keydown", onFirstInteraction);
+    };
+  }, []);
 
   useEffect(() => {
     if (!isPlaying) {
@@ -661,6 +702,63 @@ export default function App() {
         }
         .boot-screen {
           animation: bootflicker 1.4s linear infinite;
+        }
+        .music-volume-slider {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 100%;
+          height: 18px;
+          background: transparent;
+        }
+        .music-volume-slider:focus {
+          outline: none;
+        }
+        .music-volume-slider::-webkit-slider-runnable-track {
+          height: 6px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.28);
+          background:
+            linear-gradient(180deg, rgba(28,28,32,0.98), rgba(56,56,64,0.92));
+          box-shadow:
+            inset 0 0 0 1px rgba(255,255,255,0.06),
+            0 0 10px rgba(255,255,255,0.04);
+        }
+        .music-volume-slider::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 14px;
+          height: 14px;
+          margin-top: -5px;
+          border: 1px solid rgba(255,255,255,0.85);
+          border-radius: 999px;
+          background:
+            radial-gradient(circle at 35% 35%, #ffffff 0 34%, #d9ffe7 35%, #8ff0bf 72%, #5fd7a0 100%);
+          box-shadow:
+            0 0 0 2px rgba(18,18,18,0.9),
+            0 0 10px rgba(110,231,183,0.38);
+          cursor: pointer;
+        }
+        .music-volume-slider::-moz-range-track {
+          height: 6px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.28);
+          background:
+            linear-gradient(180deg, rgba(28,28,32,0.98), rgba(56,56,64,0.92));
+          box-shadow:
+            inset 0 0 0 1px rgba(255,255,255,0.06),
+            0 0 10px rgba(255,255,255,0.04);
+        }
+        .music-volume-slider::-moz-range-thumb {
+          width: 14px;
+          height: 14px;
+          border: 1px solid rgba(255,255,255,0.85);
+          border-radius: 999px;
+          background:
+            radial-gradient(circle at 35% 35%, #ffffff 0 34%, #d9ffe7 35%, #8ff0bf 72%, #5fd7a0 100%);
+          box-shadow:
+            0 0 0 2px rgba(18,18,18,0.9),
+            0 0 10px rgba(110,231,183,0.38);
+          cursor: pointer;
         }
         html, body {
           background: #f4f7f4;
@@ -1727,13 +1825,14 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="mt-3 flex h-8 items-end justify-between gap-0.5 overflow-hidden border border-emerald-300/30 bg-zinc-950/60 px-2 py-1 shadow-[0_0_18px_rgba(110,231,183,0.12)]">
+              <div className="mt-3 flex h-10 items-end justify-between gap-1 overflow-hidden border border-emerald-300/25 bg-[linear-gradient(180deg,rgba(3,10,8,0.96),rgba(16,30,24,0.92))] px-3 py-2 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04),0_0_22px_rgba(110,231,183,0.12)]">
                 {visualizerBars.map((bar, index) => (
                   <motion.span
                     key={index}
                     animate={{ height: `${Math.max(18, bar * 100)}%`, opacity: isPlaying ? 1 : 0.45 }}
                     transition={{ duration: 0.18, ease: "easeOut" }}
-                    className="block h-full min-w-0 flex-1 rounded-[1px] bg-emerald-300 shadow-[0_0_10px_rgba(110,231,183,0.8)]"
+                    className="block h-full min-w-0 flex-1 bg-[linear-gradient(180deg,#f4fff8_0%,#b8ffd7_30%,#72f2b3_68%,#29b87b_100%)] shadow-[0_0_10px_rgba(110,231,183,0.45),0_0_18px_rgba(110,231,183,0.18)]"
+                    style={{ transformOrigin: "center bottom" }}
                   />
                 ))}
               </div>
@@ -1782,7 +1881,7 @@ export default function App() {
                     onChange={(event) => {
                       setPlayerVolume(Number(event.target.value));
                     }}
-                    className="w-full accent-white"
+                    className="music-volume-slider"
                   />
                 </div>
               </div>

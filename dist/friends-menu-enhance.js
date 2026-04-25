@@ -246,11 +246,20 @@
     return true;
   }
 
-  const interval = window.setInterval(function () {
-    if (enhanceFriendsCard()) {
-      window.clearInterval(interval);
-    }
-  }, 250);
+  const interval = window.setInterval(enhanceFriendsCard, 250);
+
+  const observer = new MutationObserver(() => {
+    enhanceFriendsCard();
+  });
+
+  observer.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+  });
 
   window.addEventListener("load", enhanceFriendsCard);
+  window.addEventListener("beforeunload", () => {
+    window.clearInterval(interval);
+    observer.disconnect();
+  });
 })();
