@@ -32,16 +32,10 @@ export default function App() {
 
   const backgroundTracks = [
     {
-      title: "Dancing with your eyes closed",
-      artist: "Jane Remover",
-      src: "/music/dancing-with-your-eyes-closed-jane-remover.mp3",
-      cover: "/music/dancing-with-your-eyes-closed-jane-remover.png",
-    },
-    {
-      title: "Take a chance",
-      artist: "LynU",
-      src: "/music/take-a-chance-lynu.mp3",
-      cover: "/music/take-a-chance-lynu.jpg",
+      title: "first strike",
+      artist: "Jades",
+      src: "/music/first-strike-jades.mp3",
+      cover: "/music/first-strike-jades.jpg",
     },
   ];
 
