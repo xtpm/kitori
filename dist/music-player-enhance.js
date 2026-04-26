@@ -1,10 +1,31 @@
 (function () {
-  const TRACK = {
-    title: "first strike",
-    artist: "Jades",
-    src: "/music/first-strike-jades.mp3",
-    cover: "/music/first-strike-jades.jpg",
-  };
+  const TRACKS = [
+    {
+      title: "first strike",
+      artist: "Jades",
+      src: "/music/first-strike-jades.mp3",
+      cover: "/music/first-strike-jades.jpg",
+    },
+    {
+      title: "line sayer",
+      artist: "twikipedia, d0llywood1",
+      src: "/music/line-sayer-twikipedia-d0llywood1.mp3",
+      cover: "/music/line-sayer-twikipedia-d0llywood1.jpg",
+    },
+    {
+      title: "private freestyle",
+      artist: "jo",
+      src: "/music/private-freestyle-jo.mp3",
+      cover: "/music/private-freestyle-jo.jpg",
+    },
+    {
+      title: "i want ya",
+      artist: "kurtains",
+      src: "/music/i-want-ya-kurtains.mp3",
+      cover: "/music/i-want-ya-kurtains.png",
+    },
+  ];
+  let currentTrackIndex = Math.floor(Math.random() * TRACKS.length);
   const DEFAULT_VOLUME = 0.2;
   const STYLE_ID = "music-player-enhance-style";
   const VISUALIZER_BARS = 20;
@@ -154,10 +175,32 @@
     return document.querySelector("div.fixed.bottom-4.right-4");
   }
 
+  function getTrack() {
+    return TRACKS[currentTrackIndex] || TRACKS[0];
+  }
+
+  function loadTrack(audio, track) {
+    const source = audio.querySelector("source");
+    const currentSrc = source?.getAttribute("src") || "";
+    if (currentSrc === track.src) return;
+
+    const shouldResume = !audio.paused;
+    if (source) {
+      source.setAttribute("src", track.src);
+    } else {
+      audio.src = track.src;
+    }
+    audio.load();
+    if (shouldResume) {
+      audio.play().catch(() => undefined);
+    }
+  }
+
   function patchPlayer() {
     ensureStyles();
     const player = findPlayer();
     if (!(player instanceof HTMLElement)) return;
+    const track = getTrack();
 
     const audio = document.querySelector("audio");
     if (audio instanceof HTMLAudioElement) {
@@ -168,20 +211,7 @@
         audio.volume = DEFAULT_VOLUME;
       }
 
-      const source = audio.querySelector("source");
-      const currentSrc = source?.getAttribute("src") || "";
-      if (currentSrc !== TRACK.src) {
-        const shouldResume = !audio.paused;
-        if (source) {
-          source.setAttribute("src", TRACK.src);
-        } else {
-          audio.src = TRACK.src;
-        }
-        audio.load();
-        if (shouldResume) {
-          audio.play().catch(() => undefined);
-        }
-      }
+      loadTrack(audio, track);
 
       if (audio.dataset.musicAutoplayBound !== "true") {
         audio.dataset.musicAutoplayBound = "true";
@@ -205,17 +235,17 @@
 
     const cover = player.querySelector("img");
     if (cover instanceof HTMLImageElement) {
-      if (!cover.src.endsWith(TRACK.cover.replace("/music/", ""))) {
-        cover.src = TRACK.cover;
+      if (!cover.src.endsWith(track.cover.replace("/music/", ""))) {
+        cover.src = track.cover;
       }
       cover.alt = "Track cover";
     }
 
     const title = player.querySelector("p.text-white.text-xs");
-    if (title) title.textContent = TRACK.title;
+    if (title) title.textContent = track.title;
 
     const artist = player.querySelector("p.text-zinc-500.text-\\[11px\\]");
-    if (artist) artist.textContent = TRACK.artist;
+    if (artist) artist.textContent = track.artist;
 
     const subtitle = player.querySelector("p.text-zinc-600.text-\\[10px\\]");
     if (subtitle instanceof HTMLElement) {
@@ -252,6 +282,15 @@
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
+            currentTrackIndex =
+              label === "next"
+                ? (currentTrackIndex + 1) % TRACKS.length
+                : (currentTrackIndex - 1 + TRACKS.length) % TRACKS.length;
+            if (audio instanceof HTMLAudioElement) {
+              loadTrack(audio, getTrack());
+              audio.play().catch(() => undefined);
+            }
+            patchPlayer();
           }
         },
         true,

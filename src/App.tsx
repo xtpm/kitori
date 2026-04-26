@@ -19,7 +19,10 @@ export default function App() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(() => {
+    const trackCount = 4;
+    return Math.floor(Math.random() * trackCount);
+  });
   const [isPlaying, setIsPlaying] = useState(true);
   const [playerProgress, setPlayerProgress] = useState(0);
   const [playerDuration, setPlayerDuration] = useState(0);
@@ -36,6 +39,24 @@ export default function App() {
       artist: "Jades",
       src: "/music/first-strike-jades.mp3",
       cover: "/music/first-strike-jades.jpg",
+    },
+    {
+      title: "line sayer",
+      artist: "twikipedia, d0llywood1",
+      src: "/music/line-sayer-twikipedia-d0llywood1.mp3",
+      cover: "/music/line-sayer-twikipedia-d0llywood1.jpg",
+    },
+    {
+      title: "private freestyle",
+      artist: "jo",
+      src: "/music/private-freestyle-jo.mp3",
+      cover: "/music/private-freestyle-jo.jpg",
+    },
+    {
+      title: "i want ya",
+      artist: "kurtains",
+      src: "/music/i-want-ya-kurtains.mp3",
+      cover: "/music/i-want-ya-kurtains.png",
     },
   ];
 
