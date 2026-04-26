@@ -1508,12 +1508,12 @@ export default function App() {
                         <p className="text-sm">
                           twitter
                           <a
-                            href="https://x.com/spoofedserials"
+                        href="https://x.com/blehcode"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="ml-1 hover:underline transition-colors hover:text-blue-400"
                           >
-                            @spoofedserials
+                        @blehcode
                           </a>
                         </p>
 
