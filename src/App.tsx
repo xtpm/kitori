@@ -256,36 +256,31 @@ export default function App() {
 
   useEffect(() => {
     const target = hoverName ? "sup, im yearn" : "sup, im tpm";
-    let eraseTimer: number | null = null;
-    let typeTimer: number | null = null;
+    let phase: "erase" | "type" = "erase";
+    let nextText = typedName;
+    let targetIndex = 0;
 
-    const erase = () => {
-      setTypedName((prev) => {
-        if (prev.length > 0) {
-          eraseTimer = window.setTimeout(erase, 25);
-          return prev.slice(0, -1);
+    const interval = window.setInterval(() => {
+      if (phase === "erase") {
+        if (nextText.length > 0) {
+          nextText = nextText.slice(0, -1);
+          setTypedName(nextText);
+          return;
         }
 
-        let i = 0;
-        const type = () => {
-          setTypedName(target.slice(0, i + 1));
-          i += 1;
-          if (i < target.length) {
-            typeTimer = window.setTimeout(type, 40);
-          }
-        };
+        phase = "type";
+      }
 
-        typeTimer = window.setTimeout(type, 40);
-        return "";
-      });
-    };
+      targetIndex += 1;
+      nextText = target.slice(0, targetIndex);
+      setTypedName(nextText);
 
-    eraseTimer = window.setTimeout(erase, 25);
+      if (targetIndex >= target.length) {
+        window.clearInterval(interval);
+      }
+    }, phase === "erase" ? 24 : 38);
 
-    return () => {
-      if (eraseTimer) window.clearTimeout(eraseTimer);
-      if (typeTimer) window.clearTimeout(typeTimer);
-    };
+    return () => window.clearInterval(interval);
   }, [hoverName]);
 
   useEffect(() => {
@@ -512,6 +507,22 @@ export default function App() {
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
+
+  const formatBirthdayCountdown = (targetTime: number) => {
+    const remainingSeconds = Math.max(0, Math.floor((targetTime - now) / 1000));
+    const days = Math.floor(remainingSeconds / 86400);
+    const hours = Math.floor((remainingSeconds % 86400) / 3600);
+    const minutes = Math.floor((remainingSeconds % 3600) / 60);
+    const seconds = remainingSeconds % 60;
+
+    if (remainingSeconds === 0) {
+      return "20 now";
+    }
+
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  };
+
+  const birthdayCountdown = formatBirthdayCountdown(new Date(2026, 5, 12).getTime());
 
   const handleNyandereAnchorClick = (href: string) => (event: any) => {
     if (!href.startsWith("#")) return;
@@ -1463,7 +1474,12 @@ export default function App() {
 
                       <div className="border border-zinc-800 p-4">
                         <h3 className="text-white underline mb-2">info</h3>
-                        <p className="text-sm">19</p>
+                        <p className="text-sm flex flex-wrap items-center gap-2">
+                          <span>19</span>
+                          <span className="text-[11px] text-green-400 [text-shadow:0_0_10px_rgba(74,222,128,0.45)]">
+                            20 in {birthdayCountdown}
+                          </span>
+                        </p>
                         <p className="text-sm">emotionally unavailable</p>
                         <p className="text-sm">what&apos;s real, will prosper.</p>
                       </div>
