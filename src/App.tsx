@@ -222,7 +222,7 @@ export default function App() {
 
   useEffect(() => {
     const fetchStatus = () => {
-      fetch("https://api.lanyard.rest/v1/users/1177326138926837884")
+      fetch("https://api.lanyard.rest/v1/users/262467539685212160")
         .then((res) => res.json())
         .then((data) => {
           if (!data?.data) return;
@@ -309,7 +309,7 @@ export default function App() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    const onLoadedMetadata = () => setPlayerDuration(audio.duration || 0);
+    const onLoadedMetadata = () => setPlayerDuration(Number.isFinite(audio.duration) ? audio.duration : 0);
     const onTimeUpdate = () => setPlayerProgress(audio.currentTime || 0);
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
@@ -323,6 +323,10 @@ export default function App() {
     audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
     audio.addEventListener("ended", onEnded);
+
+    if (audio.readyState >= 1) {
+      onLoadedMetadata();
+    }
 
     return () => {
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
@@ -339,6 +343,7 @@ export default function App() {
 
     audio.load();
     setPlayerProgress(0);
+    setPlayerDuration(0);
 
     if (isPlaying) {
       audio.play().catch(() => setIsPlaying(false));
@@ -405,9 +410,9 @@ export default function App() {
       offline: "text-red-500",
     }[status] || "text-red-500";
 
-  const avatar = lanyard?.discord_user
+  const avatar = lanyard?.discord_user?.avatar
     ? `https://cdn.discordapp.com/avatars/${lanyard.discord_user.id}/${lanyard.discord_user.avatar}.png`
-    : null;
+    : "/embed-kuudere.png";
 
   const customStatus = lanyard?.activities?.find((a: any) => a.type === 4);
   const activity = lanyard?.activities?.find((a: any) => a.type === 0);
@@ -1340,9 +1345,12 @@ export default function App() {
           animate={{ opacity: booting ? 0 : 1, y: booting ? 12 : 0, scale: booting ? 0.99 : 1 }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <audio ref={audioRef} preload="metadata" playsInline>
-            <source src={currentBackgroundTrack.src} type="audio/mpeg" />
-          </audio>
+          <audio
+            ref={audioRef}
+            src={currentBackgroundTrack.src}
+            preload="auto"
+            playsInline
+          />
 
           <div className="max-w-6xl mx-auto p-6 relative z-10">
             <div className="flex items-end justify-between border-b border-zinc-800 pb-3 mb-6 text-sm gap-4">
@@ -1419,7 +1427,7 @@ export default function App() {
                             <h2 className="text-white mb-1 inline-block min-w-[13ch]">
                               {typedName}
                             </h2>
-                            <p className="text-sm text-zinc-400">professional vibecoder</p>
+                            <p className="text-sm text-zinc-400">one of one</p>
                             {customStatus && (
                               <p className="text-xs text-zinc-500 mt-1">{customStatus.state}</p>
                             )}
