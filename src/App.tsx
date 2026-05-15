@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 export default function App() {
   const nyandereLanyardUserId = "1270175700309115006";
   const [hoverName, setHoverName] = useState(false);
-  const [typedName, setTypedName] = useState("sup, im tpm");
+  const [typedName, setTypedName] = useState("sup, im retrial");
   const [status, setStatus] = useState("offline");
   const [lanyard, setLanyard] = useState<any>(null);
   const [nyandereStatus, setNyandereStatus] = useState("offline");
@@ -78,7 +78,7 @@ export default function App() {
       link: "#",
       panelTitle: "kobeni.net",
       panelText:
-        "exclusive invite-only bio link service that was meant to be a cleaner, more private take on bio pages. founded by tpm, mke, arturiafm, and lennie.",
+        "exclusive invite-only bio link service that was meant to be a cleaner, more private take on bio pages. founded by retrial, mke, arturiafm, and lennie.",
       panelMeta: "status: on hold",
     },
     {
@@ -189,7 +189,7 @@ export default function App() {
       "syncing lanyard presence... ok",
       "mounting archive... ok",
       "rendering interface... ok",
-      "welcome back, tpm",
+      "welcome back, retrial",
     ];
 
     const timers: number[] = [];
@@ -255,7 +255,7 @@ export default function App() {
   }, [nyandereLanyardUserId]);
 
   useEffect(() => {
-    const target = hoverName ? "sup, im yearn" : "sup, im tpm";
+    const target = hoverName ? "sup, im yearn" : "sup, im retrial";
     let phase: "erase" | "type" = "erase";
     let nextText = typedName;
     let targetIndex = 0;
@@ -1208,14 +1208,14 @@ export default function App() {
                               <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2">
                                   <h3 className="text-xl text-[#111827]">
-                                    {nyandereLanyard?.discord_user?.global_name || nyandereLanyard?.discord_user?.username || "tpm"}
+                                {nyandereLanyard?.discord_user?.global_name || nyandereLanyard?.discord_user?.username || "retrial"}
                                   </h3>
                                   <span className={`text-[10px] uppercase tracking-[0.28em] ${nyandereStatusColor}`}>
                                     {nyandereStatus}
                                   </span>
                                 </div>
                                 <p className="mt-1 text-sm text-[#425466]">
-                                  @{nyandereLanyard?.discord_user?.username || "xtpm"}
+                                @{nyandereLanyard?.discord_user?.username || "retrial"}
                                 </p>
                                 {nyandereCustomStatus?.state && (
                                   <p className="mt-2 line-clamp-2 leading-6 text-[#111827]">
@@ -1330,7 +1330,7 @@ export default function App() {
             >
               <div className="max-w-6xl mx-auto p-6 h-full flex items-center">
                 <div className="w-full border border-zinc-800 bg-black/20 p-6 text-sm text-green-400">
-                  <div className="mb-4 text-zinc-500">[boot@tpm ~]$ startup</div>
+                  <div className="mb-4 text-zinc-500">[boot@retrial ~]$ startup</div>
                   <div className="space-y-2 min-h-[180px]">
                     {bootLines.map((line, index) => (
                       <motion.p
@@ -1366,7 +1366,7 @@ export default function App() {
           <div className="max-w-6xl mx-auto p-6 relative z-10">
             <div className="flex items-end justify-between border-b border-zinc-800 pb-3 mb-6 text-sm gap-4">
               <div>
-                <span className="text-white">tpm</span>
+                <span className="text-white">retrial</span>
                 <span className={status === "online" ? " rgb-text" : ` ${statusColor}`}>
                   {status === "online" ? " - online" : ` - ${status}`}
                 </span>
@@ -1397,7 +1397,7 @@ export default function App() {
                 </div>
 
                 <div className="text-green-400">
-                  <span className="text-zinc-500">[tpm@local ~]$</span>{" "}
+                  <span className="text-zinc-500">[retrial@local ~]$</span>{" "}
                   {new Date(now).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
