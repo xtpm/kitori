@@ -1,7 +1,74 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
+const ACCESS_KEY = "retrial";
+
+function RetiredSiteScreen({ onUnlock }: { onUnlock: () => void }) {
+  const [key, setKey] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (key.trim() !== ACCESS_KEY) {
+      setError("invalid key");
+      return;
+    }
+
+    onUnlock();
+  };
+
+  return (
+    <main className="min-h-screen bg-[#0f0f0f] text-zinc-200 flex items-center justify-center px-6">
+      <section className="w-full max-w-md border border-zinc-800 bg-[#121212] p-6 text-center shadow-[0_18px_70px_rgba(0,0,0,0.42)]">
+        <p className="text-sm leading-7 text-zinc-400">
+          site is no longer in use, please visit{" "}
+          <a
+            href="https://retrial.cc"
+            className="text-white underline decoration-zinc-500 underline-offset-4 transition-colors hover:text-zinc-300"
+          >
+            retrial.cc
+          </a>
+        </p>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+          <input
+            type="password"
+            value={key}
+            onChange={(event) => {
+              setKey(event.target.value);
+              setError("");
+            }}
+            placeholder="access key"
+            aria-label="access key"
+            className="w-full border border-zinc-800 bg-[#0f0f0f] px-3 py-2 text-sm text-white outline-none transition-colors placeholder:text-zinc-600 focus:border-zinc-500"
+          />
+
+          <button
+            type="submit"
+            className="w-full border border-zinc-700 bg-zinc-100 px-3 py-2 text-sm text-zinc-950 transition-colors hover:bg-white"
+          >
+            enter
+          </button>
+
+          {error ? <p className="text-xs text-red-400">{error}</p> : null}
+        </form>
+      </section>
+    </main>
+  );
+}
+
 export default function App() {
+  const [unlocked, setUnlocked] = useState(false);
+
+  if (!unlocked) {
+    return <RetiredSiteScreen onUnlock={() => setUnlocked(true)} />;
+  }
+
+  return <LegacyApp />;
+}
+
+function LegacyApp() {
   const nyandereLanyardUserId = "1270175700309115006";
   const [hoverName, setHoverName] = useState(false);
   const [typedName, setTypedName] = useState("sup, im retrial");
